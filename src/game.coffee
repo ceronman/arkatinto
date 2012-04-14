@@ -22,7 +22,7 @@ window.onload = ->
 
   canvas.update (dt) ->
     paddle.update dt
-    ball.update dt, paddle
+    ball.update dt, paddle, levelMap
 
   canvas.draw () ->
     canvas.clear()

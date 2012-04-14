@@ -12,9 +12,9 @@
       tinto.activeCanvas.preserveContext (context) =>
         context.drawImage @image, @x, @y
 
-    top: -> @y - @image.height
-    bottom: -> @y
+    top: -> @y
     left: -> @x
+    bottom: -> @y + @image.height
     right: -> @x + @image.width
     centerX: -> @x + @image.width / 2
     centerY: -> @y + @image.height / 2
