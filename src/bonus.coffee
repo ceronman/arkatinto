@@ -170,13 +170,13 @@ class Bonus extends Sprite
 
   @IMAGE: resource.image("graphics/bonus.png")
   @ACTIONS: [
-    # ExtraLifeBonusAction,
-    # LargePadBonusAction,
-    # ShortPadBonusAction,
-    # ExplosionBonusAction,
-    # FastBallBonusAction,
-    # SlowBallBonusAction,
-    # FireBallBonusAction,
+    ExtraLifeBonusAction,
+    LargePadBonusAction,
+    ShortPadBonusAction,
+    ExplosionBonusAction,
+    FastBallBonusAction,
+    SlowBallBonusAction,
+    FireBallBonusAction,
     MirrorControlBonusAction,
   ]
 
@@ -191,7 +191,7 @@ class Bonus extends Sprite
   update: (dt) ->
     @y += @speed * dt
 
-    if @y > CONFIG.mapWidth
+    if @bottom() > CONFIG.mapWidth
       @map.removeBonus()
 
   executeAction: ->

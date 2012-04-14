@@ -1241,7 +1241,7 @@
 
     Bonus.IMAGE = resource.image("graphics/bonus.png");
 
-    Bonus.ACTIONS = [MirrorControlBonusAction];
+    Bonus.ACTIONS = [ExtraLifeBonusAction, LargePadBonusAction, ShortPadBonusAction, ExplosionBonusAction, FastBallBonusAction, SlowBallBonusAction, FireBallBonusAction, MirrorControlBonusAction];
 
     function Bonus(x, y, map) {
       this.x = x;
@@ -1257,7 +1257,7 @@
 
     Bonus.prototype.update = function(dt) {
       this.y += this.speed * dt;
-      if (this.y > CONFIG.mapWidth) return this.map.removeBonus();
+      if (this.bottom() > CONFIG.mapWidth) return this.map.removeBonus();
     };
 
     Bonus.prototype.executeAction = function() {
