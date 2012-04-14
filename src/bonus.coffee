@@ -79,7 +79,7 @@ class ShortPadBonusAction extends BonusAction
 
 class ExplosionBonusAction extends BonusAction
 
-  color: 'Green'
+  color: 'green'
   text: 'Bloques explosivos!'
   duration: 10
 
@@ -96,6 +96,23 @@ class ExplosionBonusAction extends BonusAction
         brick.updateImage()
 
 
+class FastBallBonusAction extends BonusAction
+
+  color: 'red'
+  text: 'Bola rapida!'
+  duration: 12
+
+  start: ->
+    @map.ball.speedX *= 2
+    @map.ball.speedY *= 2
+    @map.ball.MAX_SPEED *= 2
+
+  end: ->
+    @map.ball.speedX /= 2
+    @map.ball.speedY /= 2
+    @map.ball.MAX_SPEED /= 2
+
+
 class Bonus extends Sprite
 
   @IMAGE: resource.image("graphics/bonus.png")
@@ -103,7 +120,8 @@ class Bonus extends Sprite
     # ExtraLifeBonusAction,
     # LargePadBonusAction,
     # ShortPadBonusAction,
-    ExplosionBonusAction,
+    # ExplosionBonusAction,
+    FastBallBonusAction,
   ]
 
   constructor: (@x, @y, @map) ->

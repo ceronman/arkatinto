@@ -13,8 +13,8 @@ class Ball extends Sprite
     @state = 'ready'
 
   init: ->
-    @speedX = 200
-    @speedY = -200
+    @speedX = @MAX_SPEED / 2
+    @speedY = -@MAX_SPEED / 2
     @limitRight = CONFIG.mapWidth - @width()
     @limitLeft = 0
     @limitTop = 0

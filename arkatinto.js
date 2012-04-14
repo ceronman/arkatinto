@@ -1,5 +1,5 @@
 (function() {
-  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, Label, LargePadBonusAction, LevelMap, Paddle, SIDE, ShortPadBonusAction, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
+  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, FastBallBonusAction, Label, LargePadBonusAction, LevelMap, Paddle, SIDE, ShortPadBonusAction, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -836,8 +836,8 @@
     }
 
     Ball.prototype.init = function() {
-      this.speedX = 200;
-      this.speedY = -200;
+      this.speedX = this.MAX_SPEED / 2;
+      this.speedY = -this.MAX_SPEED / 2;
       this.limitRight = CONFIG.mapWidth - this.width();
       this.limitLeft = 0;
       this.limitTop = 0;
@@ -1065,7 +1065,7 @@
       ExplosionBonusAction.__super__.constructor.apply(this, arguments);
     }
 
-    ExplosionBonusAction.prototype.color = 'Green';
+    ExplosionBonusAction.prototype.color = 'green';
 
     ExplosionBonusAction.prototype.text = 'Bloques explosivos!';
 
@@ -1107,13 +1107,43 @@
 
   })(BonusAction);
 
+  FastBallBonusAction = (function(_super) {
+
+    __extends(FastBallBonusAction, _super);
+
+    function FastBallBonusAction() {
+      FastBallBonusAction.__super__.constructor.apply(this, arguments);
+    }
+
+    FastBallBonusAction.prototype.color = 'red';
+
+    FastBallBonusAction.prototype.text = 'Bola rapida!';
+
+    FastBallBonusAction.prototype.duration = 12;
+
+    FastBallBonusAction.prototype.start = function() {
+      this.map.ball.speedX *= 2;
+      this.map.ball.speedY *= 2;
+      return this.map.ball.MAX_SPEED *= 2;
+    };
+
+    FastBallBonusAction.prototype.end = function() {
+      this.map.ball.speedX /= 2;
+      this.map.ball.speedY /= 2;
+      return this.map.ball.MAX_SPEED /= 2;
+    };
+
+    return FastBallBonusAction;
+
+  })(BonusAction);
+
   Bonus = (function(_super) {
 
     __extends(Bonus, _super);
 
     Bonus.IMAGE = resource.image("graphics/bonus.png");
 
-    Bonus.ACTIONS = [ExplosionBonusAction];
+    Bonus.ACTIONS = [FastBallBonusAction];
 
     function Bonus(x, y, map) {
       this.x = x;
