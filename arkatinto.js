@@ -549,6 +549,8 @@
     }
 
     Brick.prototype.touch = function() {
+      var points;
+      points = this.lifes;
       this.lifes--;
       switch (this.lifes) {
         case 1:
@@ -560,7 +562,8 @@
         case 3:
           this.type = "C";
       }
-      return this.updateImage();
+      this.updateImage();
+      return points;
     };
 
     Brick.prototype.dead = function() {
@@ -619,12 +622,12 @@
     };
 
     LevelMap.prototype.removeBrickAt = function(x, y) {
-      var brick, _i, _len, _ref, _results;
+      var brick, _i, _len, _ref, _ref2, _results;
       _ref = this.bricks;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         brick = _ref[_i];
-        if ((brick != null) && brick.type === "A" && x > brick.left() && x < brick.right() && y > brick.top() && y < brick.bottom()) {
+        if ((brick != null) && ((_ref2 = brick.type) === "A" || _ref2 === "E") && x > brick.left() && x < brick.right() && y > brick.top() && y < brick.bottom()) {
           _results.push(this.removeBrick(brick));
         } else {
           _results.push(void 0);
@@ -634,7 +637,6 @@
     };
 
     LevelMap.prototype.explodeBrick = function(brick) {
-      console.log("explosion");
       this.removeBrickAt(brick.centerX() - brick.width(), brick.centerY() - brick.height());
       this.removeBrickAt(brick.centerX() - brick.width(), brick.centerY());
       this.removeBrickAt(brick.centerX() - brick.width(), brick.centerY() + brick.height());

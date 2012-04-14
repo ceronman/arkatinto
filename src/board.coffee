@@ -29,12 +29,14 @@ class Brick extends Sprite
     super image: @image
 
   touch: ->
+    points = @lifes
     @lifes--
     switch @lifes
       when 1 then @type = "A"
       when 2 then @type = "B"
       when 3 then @type = "C"
     @updateImage()
+    points
 
   dead: -> @lifes <= 0
   updateImage: ->
@@ -84,13 +86,12 @@ class LevelMap
   removeBrickAt: (x, y) ->
     # This is really inefficient.
     for brick in @bricks
-      if (brick? and brick.type == "A" and
+      if (brick? and brick.type in ["A", "E"] and
           x > brick.left() and x < brick.right() and
           y > brick.top() and y < brick.bottom())
         @removeBrick(brick)
 
   explodeBrick: (brick) ->
-    console.log "explosion"
     # Top left
     @removeBrickAt(brick.centerX() - brick.width(), brick.centerY() - brick.height())
 
