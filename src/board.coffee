@@ -148,7 +148,6 @@ class Board
 
     @bonusLabel = new Label
       font: "12pt Arial"
-      color: "lightgreen"
       x: 200
       y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4
       text: ""
@@ -159,6 +158,7 @@ class Board
     @nameLabel.text = "<#{@map.name}>"
     if @map.activeAction?
       @bonusLabel.text = @map.activeAction.text
+      @bonusLabel.color = @map.activeAction.color
     else
       @bonusLabel.text = ""
     tinto.activeCanvas.preserveContext (context) =>

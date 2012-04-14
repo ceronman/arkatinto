@@ -33,11 +33,57 @@ class ExtraLifeBonusAction extends BonusAction
   end: ->
 
 
+class LargePadBonusAction extends BonusAction
+
+  @IMAGE = resource.image("graphics/paddle_large.png")
+
+  color: 'green'
+  text: 'Agrandar!'
+  duration: 12
+
+  start: ->
+    @oldImage = @map.paddle.image
+    paddle = @map.paddle
+    center = paddle.centerX()
+    paddle.image = LargePadBonusAction.IMAGE
+    paddle.x = center - paddle.width() / 2
+
+  end: ->
+    paddle = @map.paddle
+    center = paddle.centerX()
+    paddle.image = @oldImage
+    paddle.x = center - paddle.width() / 2
+
+
+class ShortPadBonusAction extends BonusAction
+
+  @IMAGE = resource.image("graphics/paddle_short.png")
+
+  color: 'red'
+  text: 'Encoger!'
+  duration: 12
+
+  start: ->
+    @oldImage = @map.paddle.image
+    paddle = @map.paddle
+    center = paddle.centerX()
+    paddle.image = ShortPadBonusAction.IMAGE
+    paddle.x = center - paddle.width() / 2
+
+  end: ->
+    paddle = @map.paddle
+    center = paddle.centerX()
+    paddle.image = @oldImage
+    paddle.x = center - paddle.width() / 2
+
+
 class Bonus extends Sprite
 
   @IMAGE: resource.image("graphics/bonus.png")
   @ACTIONS: [
-    ExtraLifeBonusAction,
+    # ExtraLifeBonusAction,
+    # LargePadBonusAction,
+    ShortPadBonusAction,
   ]
 
   constructor: (@x, @y, @map) ->

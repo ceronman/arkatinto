@@ -1,5 +1,5 @@
 (function() {
-  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExtraLifeBonusAction, Label, LevelMap, Paddle, SIDE, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
+  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExtraLifeBonusAction, Label, LargePadBonusAction, LevelMap, Paddle, SIDE, ShortPadBonusAction, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -699,7 +699,6 @@
       });
       this.bonusLabel = new Label({
         font: "12pt Arial",
-        color: "lightgreen",
         x: 200,
         y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4,
         text: ""
@@ -713,6 +712,7 @@
       this.nameLabel.text = "<" + this.map.name + ">";
       if (this.map.activeAction != null) {
         this.bonusLabel.text = this.map.activeAction.text;
+        this.bonusLabel.color = this.map.activeAction.color;
       } else {
         this.bonusLabel.text = "";
       }
@@ -936,13 +936,87 @@
 
   })(BonusAction);
 
+  LargePadBonusAction = (function(_super) {
+
+    __extends(LargePadBonusAction, _super);
+
+    function LargePadBonusAction() {
+      LargePadBonusAction.__super__.constructor.apply(this, arguments);
+    }
+
+    LargePadBonusAction.IMAGE = resource.image("graphics/paddle_large.png");
+
+    LargePadBonusAction.prototype.color = 'green';
+
+    LargePadBonusAction.prototype.text = 'Agrandar!';
+
+    LargePadBonusAction.prototype.duration = 12;
+
+    LargePadBonusAction.prototype.start = function() {
+      var center, paddle;
+      this.oldImage = this.map.paddle.image;
+      paddle = this.map.paddle;
+      center = paddle.centerX();
+      paddle.image = LargePadBonusAction.IMAGE;
+      return paddle.x = center - paddle.width() / 2;
+    };
+
+    LargePadBonusAction.prototype.end = function() {
+      var center, paddle;
+      paddle = this.map.paddle;
+      center = paddle.centerX();
+      paddle.image = this.oldImage;
+      return paddle.x = center - paddle.width() / 2;
+    };
+
+    return LargePadBonusAction;
+
+  })(BonusAction);
+
+  ShortPadBonusAction = (function(_super) {
+
+    __extends(ShortPadBonusAction, _super);
+
+    function ShortPadBonusAction() {
+      ShortPadBonusAction.__super__.constructor.apply(this, arguments);
+    }
+
+    ShortPadBonusAction.IMAGE = resource.image("graphics/paddle_short.png");
+
+    ShortPadBonusAction.prototype.color = 'red';
+
+    ShortPadBonusAction.prototype.text = 'Encoger!';
+
+    ShortPadBonusAction.prototype.duration = 12;
+
+    ShortPadBonusAction.prototype.start = function() {
+      var center, paddle;
+      this.oldImage = this.map.paddle.image;
+      paddle = this.map.paddle;
+      center = paddle.centerX();
+      paddle.image = ShortPadBonusAction.IMAGE;
+      return paddle.x = center - paddle.width() / 2;
+    };
+
+    ShortPadBonusAction.prototype.end = function() {
+      var center, paddle;
+      paddle = this.map.paddle;
+      center = paddle.centerX();
+      paddle.image = this.oldImage;
+      return paddle.x = center - paddle.width() / 2;
+    };
+
+    return ShortPadBonusAction;
+
+  })(BonusAction);
+
   Bonus = (function(_super) {
 
     __extends(Bonus, _super);
 
     Bonus.IMAGE = resource.image("graphics/bonus.png");
 
-    Bonus.ACTIONS = [ExtraLifeBonusAction];
+    Bonus.ACTIONS = [ShortPadBonusAction];
 
     function Bonus(x, y, map) {
       this.x = x;
