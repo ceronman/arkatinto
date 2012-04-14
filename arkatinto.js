@@ -922,7 +922,7 @@
 
     ExtraLifeBonusAction.prototype.color = 'green';
 
-    ExtraLifeBonusAction.prototype.text = 'Extra life!';
+    ExtraLifeBonusAction.prototype.text = 'Vida Extra!';
 
     ExtraLifeBonusAction.prototype.duration = 2;
 

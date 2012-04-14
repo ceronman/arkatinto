@@ -24,7 +24,7 @@ class BonusAction
 class ExtraLifeBonusAction extends BonusAction
 
   color: 'green'
-  text: 'Extra life!'
+  text: 'Vida Extra!'
   duration: 2
 
   start: ->
