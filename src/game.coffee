@@ -1,9 +1,8 @@
 # Imports
-Paddle = tinto.players.Paddle
-Ball = tinto.players.Ball
-LevelMap = tinto.players.LevelMap
-Board = tinto.players.Board
-maps = tinto.maps
+key = tinto.input.key
+resource = tinto.resource
+Sprite = tinto.sprite.Sprite
+Label = tinto.text.Label
 
 window.onload = ->
   canvas = new tinto.canvas.GameCanvas 'gamecanvas',
@@ -11,25 +10,16 @@ window.onload = ->
     height: CONFIG.mapHeight + CONFIG.boardHeight
     background: 'black'
 
-  levelMap = new LevelMap(maps.LEVEL1)
-  paddle = new Paddle()
-  ball = new Ball()
-  board = new Board()
+  levelMap = new LevelMap(LEVEL1)
 
   tinto.resource.loaded () ->
-    paddle.center()
-    ball.center()
+    levelMap.init()
 
   tinto.resource.loadAll()
 
   canvas.update (dt) ->
-    paddle.update dt
-    ball.update dt, paddle, levelMap
-    board.update dt
+    levelMap.update dt
 
   canvas.draw () ->
     canvas.clear()
     levelMap.draw()
-    paddle.draw()
-    ball.draw()
-    board.draw()

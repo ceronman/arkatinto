@@ -8,7 +8,10 @@ SOURCES = src/config.coffee \
           src/sprite.coffee \
           src/text.coffee \
           src/map.coffee \
-          src/players.coffee \
+          src/collision.coffee \
+          src/board.coffee \
+          src/paddle.coffee \
+          src/ball.coffee \
           src/game.coffee
 
 build:

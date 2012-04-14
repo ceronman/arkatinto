@@ -1,5 +1,5 @@
 (function() {
-  var Ball, Board, CONFIG, Label, LevelMap, Paddle, Sprite, key, maps, resource,
+  var Ball, Board, Brick, CONFIG, Label, LevelMap, Paddle, SIDE, Sprite, collision, key, resource, ﻿LEVEL1,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -448,13 +448,383 @@
     };
   })();
 
-  ﻿(this.tinto.maps = (function() {
-    var LEVEL1;
-    LEVEL1 = "mapa base\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,A,A,A,X,X,X,X,X\nX,X,X,X,X,X,A,X,X,X,X,X,X\nX,A,A,A,A,X,B,X,A,A,A,A,X\nX,A,A,A,A,X,A,X,A,A,A,A,X\nA,X,X,X,X,X,X,X,X,X,X,X,X\nA,X,A,A,X,A,A,A,X,A,A,X,A\nA,C,X,A,X,A,A,A,X,C,X,A,A\nA,A,X,X,X,X,X,X,X,X,X,A,A\nX,X,A,A,A,A,B,A,A,A,X,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,D,A,A,X,X,A,X,X,A,A,D,X\nX,X,A,A,X,A,A,A,X,A,A,X,X\nX,X,X,X,X,A,A,A,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X";
-    return {
-      LEVEL1: LEVEL1
+  ﻿LEVEL1 = "mapa base\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,A,A,A,X,X,X,X,X\nX,X,X,X,X,X,A,X,X,X,X,X,X\nX,A,A,A,A,X,B,X,A,A,A,A,X\nX,A,A,A,A,X,A,X,A,A,A,A,X\nA,X,X,X,X,X,X,X,X,X,X,X,X\nA,X,A,A,X,A,A,A,X,A,A,X,A\nA,C,X,A,X,A,A,A,X,C,X,A,A\nA,A,X,X,X,X,X,X,X,X,X,A,A\nX,X,A,A,A,A,B,A,A,A,X,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,D,A,A,X,X,A,X,X,A,A,D,X\nX,X,A,A,X,A,A,A,X,A,A,X,X\nX,X,X,X,X,A,A,A,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X";
+
+  collision = function(sprite1, sprite2) {
+    var angle, collide;
+    collide = sprite1.right() > sprite2.left() && sprite1.left() < sprite2.right() && sprite1.bottom() > sprite2.top() && sprite1.top() < sprite2.bottom();
+    if (!collide) return false;
+    if (sprite1.left() < sprite2.left()) {
+      if (sprite1.top() < sprite2.top()) {
+        angle = Math.atan2(-sprite1.speedY, sprite1.speedX);
+        if (angle > -(Math.PI / 4)) {
+          return SIDE.left;
+        } else {
+          return SIDE.top;
+        }
+      } else if (sprite1.bottom() > sprite2.bottom()) {
+        angle = Math.atan2(-sprite1.speedY, sprite1.speedX);
+        if (angle < (Math.PI / 4)) {
+          return SIDE.left;
+        } else {
+          return SIDE.bottom;
+        }
+      } else {
+        return SIDE.left;
+      }
+    }
+    if (sprite1.right() > sprite2.right()) {
+      if (sprite1.top() < sprite2.top()) {
+        angle = Math.atan2(-sprite1.speedY, sprite1.speedX);
+        if (angle < -3 * (Math.PI / 4) || angle > (Math.PI / 2)) {
+          return SIDE.right;
+        } else {
+          return SIDE.top;
+        }
+      } else if (sprite1.bottom() > sprite2.bottom()) {
+        angle = Math.atan2(-sprite1.speedY, sprite1.speedX);
+        if (angle > 3 * (Math.PI / 4) || angle < -Math.PI / 2) {
+          return SIDE.right;
+        } else {
+          return SIDE.bottom;
+        }
+      } else {
+        return SIDE.right;
+      }
+    }
+    if (sprite1.bottom() > sprite2.bottom()) return SIDE.bottom;
+    if (sprite1.top() < sprite2.top()) return SIDE.top;
+    return console.log('unknown side');
+  };
+
+  resource = tinto.resource;
+
+  Sprite = tinto.sprite.Sprite;
+
+  Label = tinto.text.Label;
+
+  SIDE = {
+    top: 1,
+    left: 2,
+    bottom: 3,
+    right: 4
+  };
+
+  Brick = (function(_super) {
+
+    __extends(Brick, _super);
+
+    Brick.IMAGES = {
+      1: resource.image("graphics/brickA.png"),
+      2: resource.image("graphics/brickB.png"),
+      3: resource.image("graphics/brickC.png"),
+      Infinity: resource.image("graphics/brickD.png")
     };
-  })());
+
+    function Brick(x, y, type) {
+      this.x = x;
+      this.y = y;
+      this.type = type;
+      switch (this.type) {
+        case "A":
+          this.lifes = 1;
+          break;
+        case "B":
+          this.lifes = 2;
+          break;
+        case "C":
+          this.lifes = 3;
+          break;
+        default:
+          this.lifes = Infinity;
+      }
+      this.image = Brick.IMAGES[this.lifes];
+      Brick.__super__.constructor.call(this, {
+        image: this.image
+      });
+    }
+
+    Brick.prototype.touch = function() {
+      return this.lifes--;
+    };
+
+    Brick.prototype.dead = function() {
+      return this.lifes <= 0;
+    };
+
+    Brick.prototype.draw = function() {
+      this.image = Brick.IMAGES[this.lifes];
+      return Brick.__super__.draw.call(this);
+    };
+
+    return Brick;
+
+  })(Sprite);
+
+  LevelMap = (function() {
+
+    function LevelMap(content) {
+      var brick, bricks, col, line, lines, row, type, x, y, _ref, _ref2;
+      this.lifes = 3;
+      this.points = 0;
+      this.bricks = [];
+      this.paddle = new Paddle(this);
+      this.board = new Board(this);
+      this.ball = new Ball(this);
+      lines = content.split("\n");
+      this.name = lines[0];
+      lines = lines.slice(1);
+      for (row = 0, _ref = lines.length - 1; 0 <= _ref ? row <= _ref : row >= _ref; 0 <= _ref ? row++ : row--) {
+        line = lines[row];
+        bricks = line.split(",");
+        for (col = 0, _ref2 = bricks.length - 1; 0 <= _ref2 ? col <= _ref2 : col >= _ref2; 0 <= _ref2 ? col++ : col--) {
+          type = bricks[col];
+          if (type !== "X") {
+            x = col * CONFIG.cellWidth;
+            y = row * CONFIG.cellHeight;
+            brick = new Brick(x, y, type);
+            this.bricks.push(brick);
+          }
+        }
+      }
+    }
+
+    LevelMap.prototype.init = function() {
+      this.paddle.init();
+      return this.ball.init();
+    };
+
+    LevelMap.prototype.checkCollision = function(ball) {
+      var brick, collisionSide, lifes, _i, _len, _ref;
+      _ref = this.bricks;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        brick = _ref[_i];
+        collisionSide = collision(ball, brick);
+        if (collisionSide) {
+          lifes = brick.touch();
+          if (brick.type !== "D") this.points += 10 * lifes;
+          if (brick.dead()) this.removeBrick(brick);
+          return [brick, collisionSide];
+        }
+      }
+      return false;
+    };
+
+    LevelMap.prototype.removeBrick = function(brick) {
+      var index;
+      index = this.bricks.indexOf(brick);
+      return this.bricks.splice(index, 1);
+    };
+
+    LevelMap.prototype.die = function() {
+      return this.lifes--;
+    };
+
+    LevelMap.prototype.update = function(dt) {
+      this.ball.update(dt);
+      return this.paddle.update(dt);
+    };
+
+    LevelMap.prototype.draw = function() {
+      var brick, _i, _len, _ref;
+      _ref = this.bricks;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        brick = _ref[_i];
+        brick.draw();
+      }
+      this.board.draw();
+      this.ball.draw();
+      return this.paddle.draw();
+    };
+
+    return LevelMap;
+
+  })();
+
+  Board = (function() {
+
+    function Board(map) {
+      this.map = map;
+      this.lifesLabel = new Label({
+        font: "12pt Arial",
+        color: "white",
+        x: 10,
+        y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4,
+        text: "Vidas:"
+      });
+      this.pointsLabel = new Label({
+        font: "12pt Arial",
+        color: "white",
+        x: 80,
+        y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4,
+        text: "Puntos:"
+      });
+      this.nameLabel = new Label({
+        font: "12pt Arial",
+        color: "blue",
+        x: CONFIG.mapWidth,
+        y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4,
+        alignment: "right",
+        text: "Level:"
+      });
+    }
+
+    Board.prototype.draw = function() {
+      var _this = this;
+      this.lifesLabel.text = "Vidas: " + this.map.lifes;
+      this.pointsLabel.text = "Puntos: " + this.map.points;
+      this.nameLabel.text = "<" + this.map.name + ">";
+      tinto.activeCanvas.preserveContext(function(context) {
+        context.fillStyle = "gray";
+        return context.fillRect(0, CONFIG.mapHeight, CONFIG.mapWidth, CONFIG.boardHeight);
+      });
+      this.lifesLabel.draw();
+      this.pointsLabel.draw();
+      return this.nameLabel.draw();
+    };
+
+    return Board;
+
+  })();
+
+  key = tinto.input.key;
+
+  resource = tinto.resource;
+
+  Sprite = tinto.sprite.Sprite;
+
+  Paddle = (function(_super) {
+
+    __extends(Paddle, _super);
+
+    function Paddle(map) {
+      this.map = map;
+      Paddle.__super__.constructor.call(this, {
+        image: resource.image("graphics/paddle.png")
+      });
+      this.speed = 300;
+    }
+
+    Paddle.prototype.init = function() {
+      this.x = CONFIG.mapWidth / 2 - this.width() / 2;
+      this.y = CONFIG.cellHeight * 21;
+      this.limitRight = CONFIG.mapWidth - this.width();
+      return this.limitLeft = 0;
+    };
+
+    Paddle.prototype.update = function(dt) {
+      if (key("left")) this.x -= this.speed * dt;
+      if (key("right")) this.x += this.speed * dt;
+      if (this.x < this.limitLeft) this.x = this.limitLeft;
+      if (this.x > this.limitRight) return this.x = this.limitRight;
+    };
+
+    return Paddle;
+
+  })(Sprite);
+
+  key = tinto.input.key;
+
+  resource = tinto.resource;
+
+  Sprite = tinto.sprite.Sprite;
+
+  Ball = (function(_super) {
+
+    __extends(Ball, _super);
+
+    function Ball(map) {
+      this.map = map;
+      Ball.__super__.constructor.call(this, {
+        image: resource.image("graphics/ball.png")
+      });
+      this.MAX_SPEED = 300;
+      this.speedX = 200;
+      this.speedY = -200;
+      this.state = 'ready';
+    }
+
+    Ball.prototype.init = function() {
+      this.x = CONFIG.mapWidth / 2 - this.width() / 2;
+      this.y = 360;
+      this.limitRight = CONFIG.mapWidth - this.width();
+      this.limitLeft = 0;
+      this.limitTop = 0;
+      return this.limitBottom = CONFIG.mapHeight - this.height();
+    };
+
+    Ball.prototype.bouncePaddle = function(paddle) {
+      var paddleDistance, speedMagnitude;
+      this.y = paddle.top() - this.height();
+      this.speedY *= -1;
+      paddleDistance = this.centerX() - paddle.centerX();
+      speedMagnitude = paddleDistance / (paddle.width() / 2);
+      return this.speedX = this.MAX_SPEED * speedMagnitude;
+    };
+
+    Ball.prototype.bounceBrick = function(brick, side) {
+      if (side === SIDE.left) {
+        this.x = brick.left() - this.width();
+        return this.speedX *= -1;
+      } else if (side === SIDE.right) {
+        this.x = brick.right();
+        return this.speedX *= -1;
+      } else if (side === SIDE.top) {
+        this.y = brick.top() - this.height();
+        return this.speedY *= -1;
+      } else if (side === SIDE.bottom) {
+        this.y = brick.bottom();
+        return this.speedY *= -1;
+      }
+    };
+
+    Ball.prototype.update = function(dt) {
+      switch (this.state) {
+        case "playing":
+          return this.updatePlaying(dt);
+        case "ready":
+          return this.updateReady(dt);
+      }
+    };
+
+    Ball.prototype.updateReady = function(dt) {
+      var paddle;
+      paddle = this.map.paddle;
+      this.x = paddle.centerX() - this.width() / 2;
+      this.y = paddle.top() - this.height();
+      if (key("space")) return this.state = "playing";
+    };
+
+    Ball.prototype.updatePlaying = function(dt) {
+      var brick, paddle, side, _ref;
+      paddle = this.map.paddle;
+      this.x += this.speedX * dt;
+      this.y += this.speedY * dt;
+      if (this.x > this.limitRight) {
+        this.x = this.limitRight;
+        this.speedX *= -1;
+      }
+      if (this.x < this.limitLeft) {
+        this.x = this.limitLeft;
+        this.speedX *= -1;
+      }
+      if (this.y < this.limitTop) {
+        this.y = this.limitTop;
+        this.speedY *= -1;
+      }
+      if (collision(this, paddle) === SIDE.top) this.bouncePaddle(paddle);
+      if (this.y > this.limitBottom) {
+        this.init();
+        this.map.die();
+        this.state = "ready";
+      }
+      _ref = this.map.checkCollision(this), brick = _ref[0], side = _ref[1];
+      if (side) return this.bounceBrick(brick, side);
+    };
+
+    return Ball;
+
+  })(Sprite);
 
   key = tinto.input.key;
 
@@ -464,372 +834,24 @@
 
   Label = tinto.text.Label;
 
-  this.tinto.players = (function() {
-    var Ball, Board, Brick, LevelMap, Paddle, SIDE, collision, speedAngle;
-    SIDE = {
-      top: 1,
-      left: 2,
-      bottom: 3,
-      right: 4
-    };
-    speedAngle = function(speedX, speedY) {};
-    collision = function(sprite1, sprite2) {
-      var angle, collide;
-      collide = sprite1.right() > sprite2.left() && sprite1.left() < sprite2.right() && sprite1.bottom() > sprite2.top() && sprite1.top() < sprite2.bottom();
-      if (!collide) return false;
-      if (sprite1.left() < sprite2.left()) {
-        if (sprite1.top() < sprite2.top()) {
-          angle = Math.atan2(-sprite1.speedY, sprite1.speedX);
-          if (angle > -(Math.PI / 4)) {
-            return SIDE.left;
-          } else {
-            return SIDE.top;
-          }
-        } else if (sprite1.bottom() > sprite2.bottom()) {
-          angle = Math.atan2(-sprite1.speedY, sprite1.speedX);
-          if (angle < (Math.PI / 4)) {
-            return SIDE.left;
-          } else {
-            return SIDE.bottom;
-          }
-        } else {
-          return SIDE.left;
-        }
-      }
-      if (sprite1.right() > sprite2.right()) {
-        if (sprite1.top() < sprite2.top()) {
-          angle = Math.atan2(-sprite1.speedY, sprite1.speedX);
-          if (angle < -3 * (Math.PI / 4) || angle > (Math.PI / 2)) {
-            return SIDE.right;
-          } else {
-            return SIDE.top;
-          }
-        } else if (sprite1.bottom() > sprite2.bottom()) {
-          angle = Math.atan2(-sprite1.speedY, sprite1.speedX);
-          if (angle > 3 * (Math.PI / 4) || angle < -Math.PI / 2) {
-            return SIDE.right;
-          } else {
-            return SIDE.bottom;
-          }
-        } else {
-          return SIDE.right;
-        }
-      }
-      if (sprite1.bottom() > sprite2.bottom()) return SIDE.bottom;
-      if (sprite1.top() < sprite2.top()) return SIDE.top;
-      return console.log('unknown side');
-    };
-    Brick = (function(_super) {
-
-      __extends(Brick, _super);
-
-      Brick.IMAGES = {
-        1: resource.image("graphics/brickA.png"),
-        2: resource.image("graphics/brickB.png"),
-        3: resource.image("graphics/brickC.png"),
-        Infinity: resource.image("graphics/brickD.png")
-      };
-
-      function Brick(x, y, type) {
-        this.x = x;
-        this.y = y;
-        this.type = type;
-        switch (this.type) {
-          case "A":
-            this.lifes = 1;
-            break;
-          case "B":
-            this.lifes = 2;
-            break;
-          case "C":
-            this.lifes = 3;
-            break;
-          default:
-            this.lifes = Infinity;
-        }
-        this.image = Brick.IMAGES[this.lifes];
-        Brick.__super__.constructor.call(this, {
-          image: this.image
-        });
-      }
-
-      Brick.prototype.touch = function() {
-        return this.lifes--;
-      };
-
-      Brick.prototype.dead = function() {
-        return this.lifes <= 0;
-      };
-
-      Brick.prototype.draw = function() {
-        this.image = Brick.IMAGES[this.lifes];
-        return Brick.__super__.draw.call(this);
-      };
-
-      return Brick;
-
-    })(Sprite);
-    LevelMap = (function() {
-
-      function LevelMap(content) {
-        var brick, bricks, col, line, lines, row, type, x, y, _ref, _ref2;
-        this.bricks = [];
-        lines = content.split("\n");
-        this.name = lines[0];
-        lines = lines.slice(1);
-        for (row = 0, _ref = lines.length - 1; 0 <= _ref ? row <= _ref : row >= _ref; 0 <= _ref ? row++ : row--) {
-          line = lines[row];
-          bricks = line.split(",");
-          for (col = 0, _ref2 = bricks.length - 1; 0 <= _ref2 ? col <= _ref2 : col >= _ref2; 0 <= _ref2 ? col++ : col--) {
-            type = bricks[col];
-            if (type !== "X") {
-              x = col * CONFIG.cellWidth;
-              y = row * CONFIG.cellHeight;
-              brick = new Brick(x, y, type);
-              this.bricks.push(brick);
-            }
-          }
-        }
-      }
-
-      LevelMap.prototype.checkCollision = function(ball) {
-        var brick, collisionSide, _i, _len, _ref;
-        _ref = this.bricks;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          brick = _ref[_i];
-          collisionSide = collision(ball, brick);
-          if (collisionSide) {
-            brick.touch();
-            if (brick.dead()) this.removeBrick(brick);
-            return [brick, collisionSide];
-          }
-        }
-        return false;
-      };
-
-      LevelMap.prototype.removeBrick = function(brick) {
-        var index;
-        index = this.bricks.indexOf(brick);
-        return this.bricks.splice(index, 1);
-      };
-
-      LevelMap.prototype.draw = function() {
-        var brick, _i, _len, _ref, _results;
-        _ref = this.bricks;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          brick = _ref[_i];
-          _results.push(brick.draw());
-        }
-        return _results;
-      };
-
-      return LevelMap;
-
-    })();
-    Paddle = (function(_super) {
-
-      __extends(Paddle, _super);
-
-      function Paddle() {
-        Paddle.__super__.constructor.call(this, {
-          image: resource.image("graphics/paddle.png")
-        });
-        this.speed = 300;
-      }
-
-      Paddle.prototype.center = function() {
-        this.x = CONFIG.mapWidth / 2 - this.width() / 2;
-        this.y = CONFIG.cellHeight * 21;
-        this.limitRight = CONFIG.mapWidth - this.width();
-        return this.limitLeft = 0;
-      };
-
-      Paddle.prototype.update = function(dt) {
-        if (key("left")) this.x -= this.speed * dt;
-        if (key("right")) this.x += this.speed * dt;
-        if (this.x < this.limitLeft) this.x = this.limitLeft;
-        if (this.x > this.limitRight) return this.x = this.limitRight;
-      };
-
-      return Paddle;
-
-    })(Sprite);
-    Ball = (function(_super) {
-
-      __extends(Ball, _super);
-
-      function Ball() {
-        Ball.__super__.constructor.call(this, {
-          image: resource.image("graphics/ball.png")
-        });
-        this.MAX_SPEED = 300;
-        this.speedX = 200;
-        this.speedY = -200;
-        this.state = 'ready';
-      }
-
-      Ball.prototype.center = function() {
-        this.x = CONFIG.mapWidth / 2 - this.width() / 2;
-        this.y = 360;
-        this.limitRight = CONFIG.mapWidth - this.width();
-        this.limitLeft = 0;
-        this.limitTop = 0;
-        return this.limitBottom = CONFIG.mapHeight - this.height();
-      };
-
-      Ball.prototype.bouncePaddle = function(paddle) {
-        var paddleDistance, speedMagnitude;
-        this.y = paddle.top() - this.height();
-        this.speedY *= -1;
-        paddleDistance = this.centerX() - paddle.centerX();
-        speedMagnitude = paddleDistance / (paddle.width() / 2);
-        return this.speedX = this.MAX_SPEED * speedMagnitude;
-      };
-
-      Ball.prototype.bounceBrick = function(brick, side) {
-        if (side === SIDE.left) {
-          this.x = brick.left() - this.width();
-          return this.speedX *= -1;
-        } else if (side === SIDE.right) {
-          this.x = brick.right();
-          return this.speedX *= -1;
-        } else if (side === SIDE.top) {
-          this.y = brick.top() - this.height();
-          return this.speedY *= -1;
-        } else if (side === SIDE.bottom) {
-          this.y = brick.bottom();
-          return this.speedY *= -1;
-        }
-      };
-
-      Ball.prototype.update = function(dt, paddle, map) {
-        switch (this.state) {
-          case "playing":
-            return this.updatePlaying(dt, paddle, map);
-          case "ready":
-            return this.updateReady(dt, paddle, map);
-        }
-      };
-
-      Ball.prototype.updateReady = function(dt, paddle, map) {
-        this.x = paddle.centerX() - this.width() / 2;
-        this.y = paddle.top() - this.height();
-        if (key("space")) return this.state = "playing";
-      };
-
-      Ball.prototype.updatePlaying = function(dt, paddle, map) {
-        var brick, side, _ref;
-        this.x += this.speedX * dt;
-        this.y += this.speedY * dt;
-        if (this.x > this.limitRight) {
-          this.x = this.limitRight;
-          this.speedX *= -1;
-        }
-        if (this.x < this.limitLeft) {
-          this.x = this.limitLeft;
-          this.speedX *= -1;
-        }
-        if (this.y < this.limitTop) {
-          this.y = this.limitTop;
-          this.speedY *= -1;
-        }
-        if (collision(this, paddle) === SIDE.top) this.bouncePaddle(paddle);
-        if (this.y > this.limitBottom) {
-          this.center();
-          this.state = "ready";
-        }
-        _ref = map.checkCollision(this), brick = _ref[0], side = _ref[1];
-        if (side) return this.bounceBrick(brick, side);
-      };
-
-      return Ball;
-
-    })(Sprite);
-    Board = (function() {
-
-      function Board() {
-        this.lifes = CONFIG.initialLifes;
-        this.points = 0;
-        this.lifesLabel = new Label({
-          font: "12pt Arial",
-          color: "white",
-          x: 10,
-          y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4,
-          text: "Vidas: " + this.lifes
-        });
-        this.pointsLabel = new Label({
-          font: "12pt Arial",
-          color: "white",
-          x: 100,
-          y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4,
-          text: "Puntos: " + this.points
-        });
-      }
-
-      Board.prototype.update = function(dt) {
-        this.lifesLabel.text = "Vidas: " + this.lifes;
-        return this.pointsLabel.text = "Puntos: " + this.points;
-      };
-
-      Board.prototype.draw = function() {
-        var _this = this;
-        tinto.activeCanvas.preserveContext(function(context) {
-          context.fillStyle = "gray";
-          return context.fillRect(0, CONFIG.mapHeight, CONFIG.mapWidth, CONFIG.boardHeight);
-        });
-        this.lifesLabel.draw();
-        return this.pointsLabel.draw();
-      };
-
-      return Board;
-
-    })();
-    return {
-      LevelMap: LevelMap,
-      Paddle: Paddle,
-      Ball: Ball,
-      Board: Board
-    };
-  })();
-
-  Paddle = tinto.players.Paddle;
-
-  Ball = tinto.players.Ball;
-
-  LevelMap = tinto.players.LevelMap;
-
-  Board = tinto.players.Board;
-
-  maps = tinto.maps;
-
   window.onload = function() {
-    var ball, board, canvas, levelMap, paddle;
+    var canvas, levelMap;
     canvas = new tinto.canvas.GameCanvas('gamecanvas', {
       width: CONFIG.mapWidth,
       height: CONFIG.mapHeight + CONFIG.boardHeight,
       background: 'black'
     });
-    levelMap = new LevelMap(maps.LEVEL1);
-    paddle = new Paddle();
-    ball = new Ball();
-    board = new Board();
+    levelMap = new LevelMap(LEVEL1);
     tinto.resource.loaded(function() {
-      paddle.center();
-      return ball.center();
+      return levelMap.init();
     });
     tinto.resource.loadAll();
     canvas.update(function(dt) {
-      paddle.update(dt);
-      ball.update(dt, paddle, levelMap);
-      return board.update(dt);
+      return levelMap.update(dt);
     });
     return canvas.draw(function() {
       canvas.clear();
-      levelMap.draw();
-      paddle.draw();
-      ball.draw();
-      return board.draw();
+      return levelMap.draw();
     });
   };
 
