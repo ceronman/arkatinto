@@ -148,6 +148,24 @@ class FireBallBonusAction extends BonusAction
     @map.ball.fireball = false
 
 
+class MirrorControlBonusAction extends BonusAction
+
+  @IMAGE = resource.image("graphics/mirror_paddle.png")
+
+  color: 'red'
+  text: 'Control espejo!'
+  duration: 10
+
+  start: ->
+    @oldImage = @map.paddle.image
+    @map.paddle.image = MirrorControlBonusAction.IMAGE
+    @map.paddle.mirror = true
+
+  end: ->
+    @map.paddle.image = @oldImage
+    @map.paddle.mirror = false
+
+
 class Bonus extends Sprite
 
   @IMAGE: resource.image("graphics/bonus.png")
@@ -158,7 +176,8 @@ class Bonus extends Sprite
     # ExplosionBonusAction,
     # FastBallBonusAction,
     # SlowBallBonusAction,
-    FireBallBonusAction,
+    # FireBallBonusAction,
+    MirrorControlBonusAction,
   ]
 
   constructor: (@x, @y, @map) ->

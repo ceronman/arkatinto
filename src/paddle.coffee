@@ -11,6 +11,7 @@ class Paddle extends Sprite
       image: resource.image("graphics/paddle.png")
 
     @speed = 300
+    @mirror = false
 
   init: ->
     @x = CONFIG.mapWidth / 2 - @width() / 2
@@ -20,9 +21,12 @@ class Paddle extends Sprite
     @limitLeft = 0
 
   update : (dt) ->
-    if key "left"
+    leftKey = if @mirror then "right" else "left"
+    rightKey = if @mirror then "left" else "right"
+
+    if key leftKey
       @x -= @speed * dt
-    if key "right"
+    if key rightKey
       @x += @speed * dt
 
     if @x < @limitLeft

@@ -1,5 +1,5 @@
 (function() {
-  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, FastBallBonusAction, FireBallBonusAction, Label, LargePadBonusAction, LevelMap, Paddle, SIDE, ShortPadBonusAction, SlowBallBonusAction, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
+  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, FastBallBonusAction, FireBallBonusAction, Label, LargePadBonusAction, LevelMap, MirrorControlBonusAction, Paddle, SIDE, ShortPadBonusAction, SlowBallBonusAction, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -793,6 +793,7 @@
         image: resource.image("graphics/paddle.png")
       });
       this.speed = 300;
+      this.mirror = false;
     }
 
     Paddle.prototype.init = function() {
@@ -803,8 +804,11 @@
     };
 
     Paddle.prototype.update = function(dt) {
-      if (key("left")) this.x -= this.speed * dt;
-      if (key("right")) this.x += this.speed * dt;
+      var leftKey, rightKey;
+      leftKey = this.mirror ? "right" : "left";
+      rightKey = this.mirror ? "left" : "right";
+      if (key(leftKey)) this.x -= this.speed * dt;
+      if (key(rightKey)) this.x += this.speed * dt;
       if (this.x < this.limitLeft) this.x = this.limitLeft;
       if (this.x > this.limitRight) this.x = this.limitRight;
       if ((this.map.bonus != null) && collision(this.map.bonus, this)) {
@@ -1199,13 +1203,44 @@
 
   })(BonusAction);
 
+  MirrorControlBonusAction = (function(_super) {
+
+    __extends(MirrorControlBonusAction, _super);
+
+    function MirrorControlBonusAction() {
+      MirrorControlBonusAction.__super__.constructor.apply(this, arguments);
+    }
+
+    MirrorControlBonusAction.IMAGE = resource.image("graphics/mirror_paddle.png");
+
+    MirrorControlBonusAction.prototype.color = 'red';
+
+    MirrorControlBonusAction.prototype.text = 'Control espejo!';
+
+    MirrorControlBonusAction.prototype.duration = 10;
+
+    MirrorControlBonusAction.prototype.start = function() {
+      this.oldImage = this.map.paddle.image;
+      this.map.paddle.image = MirrorControlBonusAction.IMAGE;
+      return this.map.paddle.mirror = true;
+    };
+
+    MirrorControlBonusAction.prototype.end = function() {
+      this.map.paddle.image = this.oldImage;
+      return this.map.paddle.mirror = false;
+    };
+
+    return MirrorControlBonusAction;
+
+  })(BonusAction);
+
   Bonus = (function(_super) {
 
     __extends(Bonus, _super);
 
     Bonus.IMAGE = resource.image("graphics/bonus.png");
 
-    Bonus.ACTIONS = [FireBallBonusAction];
+    Bonus.ACTIONS = [MirrorControlBonusAction];
 
     function Bonus(x, y, map) {
       this.x = x;
