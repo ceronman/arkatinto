@@ -87,7 +87,7 @@ class LevelMap
   removeBrick: (brick) ->
     index = @bricks.indexOf(brick)
     @bricks.splice(index, 1)
-    if not @bonus?
+    if not @bonus? and not @activeAction?
       @bonus = new Bonus(brick.centerX(), brick.centerY(), this)
 
   removeBonus: ->
@@ -146,10 +146,21 @@ class Board
       alignment: "right"
       text: "Level:"
 
+    @bonusLabel = new Label
+      font: "12pt Arial"
+      color: "lightgreen"
+      x: 200
+      y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4
+      text: ""
+
   draw: () ->
     @lifesLabel.text = "Vidas: #{@map.lifes}"
     @pointsLabel.text = "Puntos: #{@map.points}"
     @nameLabel.text = "<#{@map.name}>"
+    if @map.activeAction?
+      @bonusLabel.text = @map.activeAction.text
+    else
+      @bonusLabel.text = ""
     tinto.activeCanvas.preserveContext (context) =>
       context.fillStyle = "gray"
       context.fillRect(0, CONFIG.mapHeight,
@@ -157,3 +168,4 @@ class Board
     @lifesLabel.draw()
     @pointsLabel.draw()
     @nameLabel.draw()
+    @bonusLabel.draw()

@@ -1,5 +1,5 @@
 (function() {
-  var Ball, Board, Bonus, Brick, CONFIG, ExtraLifeBonusAction, Label, LevelMap, Paddle, SIDE, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
+  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExtraLifeBonusAction, Label, LevelMap, Paddle, SIDE, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -623,7 +623,7 @@
       var index;
       index = this.bricks.indexOf(brick);
       this.bricks.splice(index, 1);
-      if (!(this.bonus != null)) {
+      if (!(this.bonus != null) && !(this.activeAction != null)) {
         return this.bonus = new Bonus(brick.centerX(), brick.centerY(), this);
       }
     };
@@ -697,6 +697,13 @@
         alignment: "right",
         text: "Level:"
       });
+      this.bonusLabel = new Label({
+        font: "12pt Arial",
+        color: "lightgreen",
+        x: 200,
+        y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4,
+        text: ""
+      });
     }
 
     Board.prototype.draw = function() {
@@ -704,13 +711,19 @@
       this.lifesLabel.text = "Vidas: " + this.map.lifes;
       this.pointsLabel.text = "Puntos: " + this.map.points;
       this.nameLabel.text = "<" + this.map.name + ">";
+      if (this.map.activeAction != null) {
+        this.bonusLabel.text = this.map.activeAction.text;
+      } else {
+        this.bonusLabel.text = "";
+      }
       tinto.activeCanvas.preserveContext(function(context) {
         context.fillStyle = "gray";
         return context.fillRect(0, CONFIG.mapHeight, CONFIG.mapWidth, CONFIG.boardHeight);
       });
       this.lifesLabel.draw();
       this.pointsLabel.draw();
-      return this.nameLabel.draw();
+      this.nameLabel.draw();
+      return this.bonusLabel.draw();
     };
 
     return Board;
@@ -876,17 +889,52 @@
     return items[Math.floor(Math.random() * items.length)];
   };
 
-  ExtraLifeBonusAction = (function() {
+  BonusAction = (function() {
 
-    function ExtraLifeBonusAction() {}
+    function BonusAction() {}
 
-    ExtraLifeBonusAction.prototype.execute = function(map) {
-      return map.lifes++;
+    BonusAction.prototype.execute = function(map) {
+      var _this = this;
+      this.map = map;
+      this.start();
+      return setTimeout((function() {
+        _this.end();
+        return _this.map.activeAction = null;
+      }), this.duration * 1000);
     };
+
+    BonusAction.prototype.remove = function() {
+      this.end();
+      return this.map.activeAction = null;
+    };
+
+    return BonusAction;
+
+  })();
+
+  ExtraLifeBonusAction = (function(_super) {
+
+    __extends(ExtraLifeBonusAction, _super);
+
+    function ExtraLifeBonusAction() {
+      ExtraLifeBonusAction.__super__.constructor.apply(this, arguments);
+    }
+
+    ExtraLifeBonusAction.prototype.color = 'green';
+
+    ExtraLifeBonusAction.prototype.text = 'Extra life!';
+
+    ExtraLifeBonusAction.prototype.duration = 2;
+
+    ExtraLifeBonusAction.prototype.start = function() {
+      return this.map.lifes++;
+    };
+
+    ExtraLifeBonusAction.prototype.end = function() {};
 
     return ExtraLifeBonusAction;
 
-  })();
+  })(BonusAction);
 
   Bonus = (function(_super) {
 
@@ -897,7 +945,6 @@
     Bonus.ACTIONS = [ExtraLifeBonusAction];
 
     function Bonus(x, y, map) {
-      var BonusAction;
       this.x = x;
       this.y = y;
       this.map = map;
@@ -915,6 +962,7 @@
     };
 
     Bonus.prototype.executeAction = function() {
+      this.map.activeAction = this.action;
       this.action.execute(this.map);
       return this.map.removeBonus();
     };

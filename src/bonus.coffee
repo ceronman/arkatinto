@@ -7,10 +7,31 @@ Sprite = tinto.sprite.Sprite
 randomChoice = (items) ->
   items[Math.floor(Math.random() * items.length)];
 
-
-class ExtraLifeBonusAction
+class BonusAction
   execute: (map) ->
-    map.lifes++
+    @map = map
+    @start()
+    setTimeout((=>
+      @end()
+      @map.activeAction = null
+      ), @duration * 1000)
+
+  remove: ->
+    @end()
+    @map.activeAction = null
+
+
+class ExtraLifeBonusAction extends BonusAction
+
+  color: 'green'
+  text: 'Extra life!'
+  duration: 2
+
+  start: ->
+    @map.lifes++
+
+  end: ->
+
 
 class Bonus extends Sprite
 
@@ -34,5 +55,6 @@ class Bonus extends Sprite
       @map.removeBonus()
 
   executeAction: ->
+    @map.activeAction = @action
     @action.execute(@map)
     @map.removeBonus()
