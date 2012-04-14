@@ -42,7 +42,7 @@ Sprite = tinto.sprite.Sprite
     if sprite1.right() > sprite2.right()
       if sprite1.top() < sprite2.top()
         angle = Math.atan2(-sprite1.speedY, sprite1.speedX)
-        if  angle < -3*(Math.PI/4) or angle > Math.PI/2)
+        if angle < -3*(Math.PI/4) or angle > (Math.PI/2)
           return SIDE.right
         else
           return SIDE.top
@@ -61,7 +61,6 @@ Sprite = tinto.sprite.Sprite
     if sprite1.top() < sprite2.top()
       return SIDE.top
     console.log('unknown side')
-
 
 
   class Brick extends Sprite
@@ -146,16 +145,16 @@ Sprite = tinto.sprite.Sprite
       super
         image: resource.image("graphics/ball.png")
 
-      @MAX_SPEED = 400
+      @MAX_SPEED = 200
 
-      @speedX = 200
-      @speedY = -200
+      @speedX = 100
+      @speedY = -100
 
     center: ->
       @x = CONFIG.mapWidth / 2 - @width() / 2
       # @y = CONFIG.mapHeight / 2 - @height() / 2
       # @x = 100
-      @y = 800
+      @y = 360
 
       @limitRight = CONFIG.mapWidth - @width()
       @limitLeft = 0
@@ -170,20 +169,18 @@ Sprite = tinto.sprite.Sprite
       @speedX = @MAX_SPEED * speedMagnitude
 
     bounceBrick: (brick, side) ->
-      switch side
-        when SIDE.left then
-          @x = brick.left() - @width()
-          @speedX *= -1
-        when SIDE.right then
-          @x = brick.right()
-          @speedX *= -1
-        when SIDE.top then
-          @y = brick.top() - @height()
-          @speedY *= -1
-        when SIDE.bottom then
-          @y = brick.bottom()
-          @speedY *= -1
-
+      if side == SIDE.left
+        @x = brick.left() - @width()
+        @speedX *= -1
+      else if side == SIDE.right
+        @x = brick.right()
+        @speedX *= -1
+      else if side == SIDE.top
+        @y = brick.top() - @height()
+        @speedY *= -1
+      else if side == SIDE.bottom
+        @y = brick.bottom()
+        @speedY *= -1
 
     update: (dt, paddle, map) ->
       @x += @speedX * dt
