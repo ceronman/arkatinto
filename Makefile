@@ -7,6 +7,7 @@ SOURCES = src/config.coffee \
           src/resource.coffee \
           src/sprite.coffee \
           src/text.coffee \
+          src/map.coffee \
           src/players.coffee \
           src/game.coffee
 

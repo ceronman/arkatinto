@@ -5,6 +5,38 @@ Sprite = tinto.sprite.Sprite
 
 @tinto.players = do ->
 
+  class Brick extends Sprite
+    constructor: (@x, @y, @type)->
+      super
+        image: resource.image("graphics/brick#{type}.png")
+
+
+  class LevelMap
+    constructor: (content) ->
+      @bricks = []
+
+      lines = content.split("\n")
+      @name = lines[0]
+      lines = lines[1..]
+
+      for row in [0..lines.length-1]
+        line = lines[row]
+        console.log "line", line
+        bricks = line.split(",")
+        for col in [0..bricks.length-1]
+          type = bricks[col]
+          console.log "brick", type
+          if type != "X"
+            x = col * CONFIG.cellWidth
+            y = row * CONFIG.cellHeight
+            brick = new Brick(x, y, type)
+            @bricks.push brick
+
+    draw: ->
+      for brick in @bricks
+        brick.draw()
+
+
   class Paddle extends Sprite
 
     constructor: ->
@@ -87,5 +119,6 @@ Sprite = tinto.sprite.Sprite
         @center()
 
 
+  LevelMap: LevelMap
   Paddle: Paddle
   Ball: Ball
