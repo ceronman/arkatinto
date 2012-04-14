@@ -12,7 +12,7 @@ Sprite = tinto.sprite.Sprite
     right: 4
 
   speedAngle = (speedX, speedY) ->
-    Math.atan2(speedY, speedX)
+
 
   collision = (sprite1, sprite2) ->
     collide = (sprite1.right() > sprite2.left() and
@@ -25,12 +25,14 @@ Sprite = tinto.sprite.Sprite
 
     if sprite1.left() < sprite2.left()
       if sprite1.top() < sprite2.top()
-        if speedAngle(sprite1.speedX, -sprite1.speedY) < -(Math.PI/4)
+        angle = Math.atan2(-sprite1.speedY, sprite1.speedX)
+        if angle > -(Math.PI/4)
           return SIDE.left
         else
           return SIDE.top
       else if sprite1.bottom() > sprite2.bottom()
-        if speedAngle(sprite1.speedX, -sprite1.speedY) < (Math.PI/4)
+        angle = Math.atan2(-sprite1.speedY, sprite1.speedX)
+        if  angle < (Math.PI/4)
           return SIDE.left
         else
           return SIDE.bottom
@@ -39,21 +41,26 @@ Sprite = tinto.sprite.Sprite
 
     if sprite1.right() > sprite2.right()
       if sprite1.top() < sprite2.top()
-        if speedAngle(sprite1.speedX, -sprite1.speedY) < -3*(Math.PI/4)
+        angle = Math.atan2(-sprite1.speedY, sprite1.speedX)
+        if  angle < -3*(Math.PI/4) or angle > Math.PI/2)
           return SIDE.right
         else
           return SIDE.top
 
       else if sprite1.bottom() > sprite2.bottom()
-        if speedAngle(sprite1.speedX, -sprite1.speedY) > 3*(Math.PI/4)
+        angle = Math.atan2(-sprite1.speedY, sprite1.speedX)
+        if angle > 3*(Math.PI/4) or angle < -Math.PI/2
           return SIDE.right
         else
           return SIDE.bottom
+      else
+        return SIDE.right
 
     if sprite1.bottom() > sprite2.bottom()
       return SIDE.bottom
-    else
+    if sprite1.top() < sprite2.top()
       return SIDE.top
+    console.log('unknown side')
 
 
 
@@ -88,12 +95,12 @@ Sprite = tinto.sprite.Sprite
 
     checkCollision: (ball) ->
       for brick in @bricks
-        if collision(ball, brick)
-          console.log collision(ball, brick)
+        collisionSide = collision(ball, brick)
+        if collisionSide
           brick.touch()
           if brick.dead()
             @removeBrick(brick)
-          return true
+          return [brick, collisionSide]
       return false
 
     removeBrick: (brick) ->
@@ -139,10 +146,10 @@ Sprite = tinto.sprite.Sprite
       super
         image: resource.image("graphics/ball.png")
 
-      @MAX_SPEED = 4
+      @MAX_SPEED = 400
 
-      @speedX = 1
-      @speedY = -20
+      @speedX = 200
+      @speedY = -200
 
     center: ->
       @x = CONFIG.mapWidth / 2 - @width() / 2
@@ -155,12 +162,28 @@ Sprite = tinto.sprite.Sprite
       @limitTop = 0
       @limitBottom = CONFIG.mapHeight - @height()
 
-    bounce: (paddle) ->
-      @y = paddle.top()
+    bouncePaddle: (paddle) ->
+      @y = paddle.top() - @height()
       @speedY *= -1
       paddleDistance = @centerX() - paddle.centerX()
       speedMagnitude = paddleDistance / (paddle.width() / 2)
       @speedX = @MAX_SPEED * speedMagnitude
+
+    bounceBrick: (brick, side) ->
+      switch side
+        when SIDE.left then
+          @x = brick.left() - @width()
+          @speedX *= -1
+        when SIDE.right then
+          @x = brick.right()
+          @speedX *= -1
+        when SIDE.top then
+          @y = brick.top() - @height()
+          @speedY *= -1
+        when SIDE.bottom then
+          @y = brick.bottom()
+          @speedY *= -1
+
 
     update: (dt, paddle, map) ->
       @x += @speedX * dt
@@ -179,12 +202,15 @@ Sprite = tinto.sprite.Sprite
         @y = @limitTop
         @speedY *= -1
 
-      if collision(this, paddle)
-        @bounce(paddle)
-      else if @y > @limitBottom
+      if collision(this, paddle) == SIDE.top
+        @bouncePaddle(paddle)
+
+      if @y > @limitBottom
         @center()
 
-      map.checkCollision(this)
+      [brick, side] = map.checkCollision(this)
+      if side
+        @bounceBrick(brick, side)
 
 
   LevelMap: LevelMap
