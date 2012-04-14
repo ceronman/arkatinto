@@ -10,18 +10,11 @@ class Ball extends Sprite
       image: resource.image("graphics/ball.png")
 
     @MAX_SPEED = 300
-
-    @speedX = 200
-    @speedY = -200
-
     @state = 'ready'
 
   init: ->
-    @x = CONFIG.mapWidth / 2 - @width() / 2
-    # @y = CONFIG.mapHeight / 2 - @height() / 2
-    # @x = 100
-    @y = 360
-
+    @speedX = 200
+    @speedY = -200
     @limitRight = CONFIG.mapWidth - @width()
     @limitLeft = 0
     @limitTop = 0
@@ -52,6 +45,12 @@ class Ball extends Sprite
     switch @state
       when "playing" then @updatePlaying dt
       when "ready" then @updateReady dt
+      when "lost" then @updateLost dt
+
+  updateLost: (dt) ->
+    paddle = @map.paddle
+    @x = paddle.centerX() - @width() / 2
+    @y = paddle.top() - @height()
 
   updateReady: (dt) ->
     paddle = @map.paddle

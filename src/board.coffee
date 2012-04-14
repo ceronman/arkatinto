@@ -91,11 +91,14 @@ class LevelMap
 
   checkState: ->
     if @lifes < 0
-      console.log 'perdio'
+      @ball.state = "lost"
+      @stateLabel.text = "GAME OVER"
+      @stateLabel.color = "red"
 
   update: (dt) ->
     @ball.update dt
     @paddle.update dt
+    @checkState()
 
   draw: ->
     for brick in @bricks
@@ -104,7 +107,7 @@ class LevelMap
     @ball.draw()
     @paddle.draw()
 
-    if @ball.state == "ready"
+    if @ball.state != "playing"
       @stateLabel.draw()
 
 

@@ -629,12 +629,17 @@
     };
 
     LevelMap.prototype.checkState = function() {
-      if (this.lifes < 0) return console.log('perdio');
+      if (this.lifes < 0) {
+        this.ball.state = "lost";
+        this.stateLabel.text = "GAME OVER";
+        return this.stateLabel.color = "red";
+      }
     };
 
     LevelMap.prototype.update = function(dt) {
       this.ball.update(dt);
-      return this.paddle.update(dt);
+      this.paddle.update(dt);
+      return this.checkState();
     };
 
     LevelMap.prototype.draw = function() {
@@ -647,7 +652,7 @@
       this.board.draw();
       this.ball.draw();
       this.paddle.draw();
-      if (this.ball.state === "ready") return this.stateLabel.draw();
+      if (this.ball.state !== "playing") return this.stateLabel.draw();
     };
 
     return LevelMap;
@@ -752,14 +757,12 @@
         image: resource.image("graphics/ball.png")
       });
       this.MAX_SPEED = 300;
-      this.speedX = 200;
-      this.speedY = -200;
       this.state = 'ready';
     }
 
     Ball.prototype.init = function() {
-      this.x = CONFIG.mapWidth / 2 - this.width() / 2;
-      this.y = 360;
+      this.speedX = 200;
+      this.speedY = -200;
       this.limitRight = CONFIG.mapWidth - this.width();
       this.limitLeft = 0;
       this.limitTop = 0;
@@ -797,7 +800,16 @@
           return this.updatePlaying(dt);
         case "ready":
           return this.updateReady(dt);
+        case "lost":
+          return this.updateLost(dt);
       }
+    };
+
+    Ball.prototype.updateLost = function(dt) {
+      var paddle;
+      paddle = this.map.paddle;
+      this.x = paddle.centerX() - this.width() / 2;
+      return this.y = paddle.top() - this.height();
     };
 
     Ball.prototype.updateReady = function(dt) {
