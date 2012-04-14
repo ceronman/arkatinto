@@ -1,13 +1,17 @@
-window.onload = () ->
-  canvas = new tinto.canvas.GameCanvas('gamecanvas')
+window.onload = ->
+  canvas = new tinto.canvas.GameCanvas 'gamecanvas',
+    width: CONFIG.mapWidth
+    height: CONFIG.mapHeight
+    background: 'gray'
 
-  label = new tinto.text.Label
-    text: 'Hello World!'
-    x: canvas.width /2
-    y: canvas.height/2
-    alignment: 'center'
-    color: '#FFAAAA'
-    font: 'Bold 40pt Arial'
+  canvas.context2D.globalAlpha = 0.5
+
+  paddle = new tinto.players.Paddle()
+
+  tinto.resource.loaded () ->
+    paddle.center()
+
+  tinto.resource.loadAll()
 
   canvas.draw () ->
-    label.draw()
+    paddle.draw()
