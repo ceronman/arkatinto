@@ -11,6 +11,7 @@ class Ball extends Sprite
 
     @MAX_SPEED = 300
     @state = 'ready'
+    @fireball = false
 
   init: ->
     @speedX = @MAX_SPEED / 2
@@ -87,5 +88,5 @@ class Ball extends Sprite
       @state = "ready"
 
     [brick, side] = @map.checkCollision(this)
-    if side
+    if side and not @fireball
       @bounceBrick(brick, side)

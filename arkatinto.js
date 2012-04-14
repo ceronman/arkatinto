@@ -1,5 +1,5 @@
 (function() {
-  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, FastBallBonusAction, Label, LargePadBonusAction, LevelMap, Paddle, SIDE, ShortPadBonusAction, SlowBallBonusAction, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
+  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, FastBallBonusAction, FireBallBonusAction, Label, LargePadBonusAction, LevelMap, Paddle, SIDE, ShortPadBonusAction, SlowBallBonusAction, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -833,6 +833,7 @@
       });
       this.MAX_SPEED = 300;
       this.state = 'ready';
+      this.fireball = false;
     }
 
     Ball.prototype.init = function() {
@@ -919,7 +920,7 @@
         this.state = "ready";
       }
       _ref = this.map.checkCollision(this), brick = _ref[0], side = _ref[1];
-      if (side) return this.bounceBrick(brick, side);
+      if (side && !this.fireball) return this.bounceBrick(brick, side);
     };
 
     return Ball;
@@ -1149,7 +1150,7 @@
 
     SlowBallBonusAction.prototype.text = 'Bola lenta!';
 
-    SlowBallBonusAction.prototype.duration = 12;
+    SlowBallBonusAction.prototype.duration = 10;
 
     SlowBallBonusAction.prototype.start = function() {
       this.map.ball.speedX /= 2;
@@ -1167,13 +1168,44 @@
 
   })(BonusAction);
 
+  FireBallBonusAction = (function(_super) {
+
+    __extends(FireBallBonusAction, _super);
+
+    function FireBallBonusAction() {
+      FireBallBonusAction.__super__.constructor.apply(this, arguments);
+    }
+
+    FireBallBonusAction.IMAGE = resource.image("graphics/fireball.png");
+
+    FireBallBonusAction.prototype.color = 'green';
+
+    FireBallBonusAction.prototype.text = 'Bola de fuego!';
+
+    FireBallBonusAction.prototype.duration = 10;
+
+    FireBallBonusAction.prototype.start = function() {
+      this.oldImage = this.map.ball.image;
+      this.map.ball.image = FireBallBonusAction.IMAGE;
+      return this.map.ball.fireball = true;
+    };
+
+    FireBallBonusAction.prototype.end = function() {
+      this.map.ball.image = this.oldImage;
+      return this.map.ball.fireball = false;
+    };
+
+    return FireBallBonusAction;
+
+  })(BonusAction);
+
   Bonus = (function(_super) {
 
     __extends(Bonus, _super);
 
     Bonus.IMAGE = resource.image("graphics/bonus.png");
 
-    Bonus.ACTIONS = [SlowBallBonusAction];
+    Bonus.ACTIONS = [FireBallBonusAction];
 
     function Bonus(x, y, map) {
       this.x = x;
