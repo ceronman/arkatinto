@@ -575,6 +575,8 @@
       this.board = new Board(this);
       this.ball = new Ball(this);
       this.bonus = null;
+      this.music = resource.sound("sounds/ride-the-storm.ogg");
+      this.music.play();
       this.stateLabel = new Label({
         font: "20pt Arial",
         color: "yellow",
