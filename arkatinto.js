@@ -571,6 +571,14 @@
       this.paddle = new Paddle(this);
       this.board = new Board(this);
       this.ball = new Ball(this);
+      this.stateLabel = new Label({
+        font: "20pt Arial",
+        color: "yellow",
+        x: CONFIG.mapWidth / 2,
+        y: 3 * CONFIG.mapHeight / 4,
+        alignment: "center",
+        text: "Presione 'espacio' para lanzar"
+      });
       lines = content.split("\n");
       this.name = lines[0];
       lines = lines.slice(1);
@@ -620,6 +628,10 @@
       return this.lifes--;
     };
 
+    LevelMap.prototype.checkState = function() {
+      if (this.lifes < 0) return console.log('perdio');
+    };
+
     LevelMap.prototype.update = function(dt) {
       this.ball.update(dt);
       return this.paddle.update(dt);
@@ -634,7 +646,8 @@
       }
       this.board.draw();
       this.ball.draw();
-      return this.paddle.draw();
+      this.paddle.draw();
+      if (this.ball.state === "ready") return this.stateLabel.draw();
     };
 
     return LevelMap;

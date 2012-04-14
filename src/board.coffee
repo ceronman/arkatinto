@@ -44,6 +44,14 @@ class LevelMap
     @board = new Board(this)
     @ball = new Ball(this)
 
+    @stateLabel  = new Label
+      font: "20pt Arial"
+      color: "yellow"
+      x: CONFIG.mapWidth / 2
+      y: 3* CONFIG.mapHeight / 4
+      alignment: "center"
+      text: "Presione 'espacio' para lanzar"
+
     lines = content.split("\n")
     @name = lines[0]
     lines = lines[1..]
@@ -81,6 +89,10 @@ class LevelMap
 
   die: -> @lifes--
 
+  checkState: ->
+    if @lifes < 0
+      console.log 'perdio'
+
   update: (dt) ->
     @ball.update dt
     @paddle.update dt
@@ -91,6 +103,9 @@ class LevelMap
     @board.draw()
     @ball.draw()
     @paddle.draw()
+
+    if @ball.state == "ready"
+      @stateLabel.draw()
 
 
 class Board
