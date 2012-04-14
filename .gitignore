@@ -1,2 +1,3 @@
 *.js
+!arkatinto.js
 .project
