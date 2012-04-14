@@ -77,13 +77,33 @@ class ShortPadBonusAction extends BonusAction
     paddle.x = center - paddle.width() / 2
 
 
+class ExplosionBonusAction extends BonusAction
+
+  color: 'Green'
+  text: 'Bloques explosivos!'
+  duration: 10
+
+  start: ->
+    for brick in @map.bricks
+      if brick? and brick.type == "A"
+        brick.type = "E"
+        brick.updateImage()
+
+  end: ->
+    for brick in @map.bricks
+      if brick? and brick.type == "E"
+        brick.type = "A"
+        brick.updateImage()
+
+
 class Bonus extends Sprite
 
   @IMAGE: resource.image("graphics/bonus.png")
   @ACTIONS: [
     # ExtraLifeBonusAction,
     # LargePadBonusAction,
-    ShortPadBonusAction,
+    # ShortPadBonusAction,
+    ExplosionBonusAction,
   ]
 
   constructor: (@x, @y, @map) ->

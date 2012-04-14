@@ -1,5 +1,5 @@
 (function() {
-  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExtraLifeBonusAction, Label, LargePadBonusAction, LevelMap, Paddle, SIDE, ShortPadBonusAction, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
+  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, Label, LargePadBonusAction, LevelMap, Paddle, SIDE, ShortPadBonusAction, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -448,7 +448,7 @@
     };
   })();
 
-  ﻿LEVEL1 = "mapa base\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,A,A,A,X,X,X,X,X\nX,X,X,X,X,X,A,X,X,X,X,X,X\nX,A,A,A,A,X,B,X,A,A,A,A,X\nX,A,A,A,A,X,A,X,A,A,A,A,X\nA,X,X,X,X,X,X,X,X,X,X,X,X\nA,X,A,A,X,A,A,A,X,A,A,X,A\nA,C,X,A,X,A,A,A,X,C,X,A,A\nA,A,X,X,X,X,X,X,X,X,X,A,A\nX,X,A,A,A,A,B,A,A,A,X,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,D,A,A,X,X,A,X,X,A,A,D,X\nX,X,A,A,X,A,A,A,X,A,A,X,X\nX,X,X,X,X,A,A,A,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X";
+  ﻿LEVEL1 = "mapa base\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,A,A,A,X,X,X,X,X\nX,X,X,X,X,X,A,X,X,X,X,X,X\nX,A,A,A,A,X,B,X,A,A,A,A,X\nX,A,A,A,A,X,A,X,A,A,A,A,X\nA,X,X,X,X,X,X,X,X,X,X,X,X\nA,X,A,A,X,A,A,A,X,A,A,X,A\nA,C,X,A,X,A,A,A,X,C,X,A,A\nA,A,X,X,X,X,X,X,X,X,X,A,A\nX,X,A,A,A,A,B,A,A,A,X,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,D,A,A,X,X,A,X,X,A,A,D,X\nX,X,A,A,X,A,A,A,X,A,A,X,X\nX,X,X,X,X,A,E,A,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X";
 
   collision = function(sprite1, sprite2) {
     var angle, collide;
@@ -515,10 +515,11 @@
     __extends(Brick, _super);
 
     Brick.IMAGES = {
-      1: resource.image("graphics/brickA.png"),
-      2: resource.image("graphics/brickB.png"),
-      3: resource.image("graphics/brickC.png"),
-      Infinity: resource.image("graphics/brickD.png")
+      "A": resource.image("graphics/brickA.png"),
+      "B": resource.image("graphics/brickB.png"),
+      "C": resource.image("graphics/brickC.png"),
+      "D": resource.image("graphics/brickD.png"),
+      "E": resource.image("graphics/brickE.png")
     };
 
     function Brick(x, y, type) {
@@ -535,10 +536,13 @@
         case "C":
           this.lifes = 3;
           break;
+        case "E":
+          this.lifes = 1;
+          break;
         default:
           this.lifes = Infinity;
       }
-      this.image = Brick.IMAGES[this.lifes];
+      this.updateImage();
       Brick.__super__.constructor.call(this, {
         image: this.image
       });
@@ -552,9 +556,8 @@
       return this.lifes <= 0;
     };
 
-    Brick.prototype.draw = function() {
-      this.image = Brick.IMAGES[this.lifes];
-      return Brick.__super__.draw.call(this);
+    Brick.prototype.updateImage = function() {
+      return this.image = Brick.IMAGES[this.type];
     };
 
     return Brick;
@@ -603,6 +606,33 @@
       return this.ball.init();
     };
 
+    LevelMap.prototype.removeBrickAt = function(x, y) {
+      var brick, _i, _len, _ref, _results;
+      _ref = this.bricks;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        brick = _ref[_i];
+        if ((brick != null) && x > brick.left() && x < brick.right() && y > brick.top() && y < brick.bottom()) {
+          _results.push(this.removeBrick(brick));
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+
+    LevelMap.prototype.explodeBrick = function(brick) {
+      console.log("explosion");
+      this.removeBrickAt(brick.centerX() - brick.width(), brick.centerY() - brick.height());
+      this.removeBrickAt(brick.centerX() - brick.width(), brick.centerY());
+      this.removeBrickAt(brick.centerX() - brick.width(), brick.centerY() + brick.height());
+      this.removeBrickAt(brick.centerX() + brick.width(), brick.centerY() - brick.height());
+      this.removeBrickAt(brick.centerX() + brick.width(), brick.centerY());
+      this.removeBrickAt(brick.centerX() + brick.width(), brick.centerY() + brick.height());
+      this.removeBrickAt(brick.centerX(), brick.centerY() - brick.height());
+      return this.removeBrickAt(brick.centerX(), brick.centerY() + brick.height());
+    };
+
     LevelMap.prototype.checkCollision = function(ball) {
       var brick, collisionSide, lifes, _i, _len, _ref;
       _ref = this.bricks;
@@ -612,7 +642,13 @@
         if (collisionSide) {
           lifes = brick.touch();
           if (brick.type !== "D") this.points += 10 * lifes;
-          if (brick.dead()) this.removeBrick(brick);
+          if (brick.dead()) {
+            if (brick.type === "E") this.explodeBrick(brick);
+            this.removeBrick(brick);
+            if (!(this.bonus != null) && !(this.activeAction != null)) {
+              this.bonus = new Bonus(brick.centerX(), brick.centerY(), this);
+            }
+          }
           return [brick, collisionSide];
         }
       }
@@ -622,10 +658,7 @@
     LevelMap.prototype.removeBrick = function(brick) {
       var index;
       index = this.bricks.indexOf(brick);
-      this.bricks.splice(index, 1);
-      if (!(this.bonus != null) && !(this.activeAction != null)) {
-        return this.bonus = new Bonus(brick.centerX(), brick.centerY(), this);
-      }
+      return this.bricks.splice(index, 1);
     };
 
     LevelMap.prototype.removeBonus = function() {
@@ -1010,13 +1043,63 @@
 
   })(BonusAction);
 
+  ExplosionBonusAction = (function(_super) {
+
+    __extends(ExplosionBonusAction, _super);
+
+    function ExplosionBonusAction() {
+      ExplosionBonusAction.__super__.constructor.apply(this, arguments);
+    }
+
+    ExplosionBonusAction.prototype.color = 'Green';
+
+    ExplosionBonusAction.prototype.text = 'Bloques explosivos!';
+
+    ExplosionBonusAction.prototype.duration = 10;
+
+    ExplosionBonusAction.prototype.start = function() {
+      var brick, _i, _len, _ref, _results;
+      _ref = this.map.bricks;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        brick = _ref[_i];
+        if ((brick != null) && brick.type === "A") {
+          brick.type = "E";
+          _results.push(brick.updateImage());
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+
+    ExplosionBonusAction.prototype.end = function() {
+      var brick, _i, _len, _ref, _results;
+      _ref = this.map.bricks;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        brick = _ref[_i];
+        if ((brick != null) && brick.type === "E") {
+          brick.type = "A";
+          _results.push(brick.updateImage());
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+
+    return ExplosionBonusAction;
+
+  })(BonusAction);
+
   Bonus = (function(_super) {
 
     __extends(Bonus, _super);
 
     Bonus.IMAGE = resource.image("graphics/bonus.png");
 
-    Bonus.ACTIONS = [ShortPadBonusAction];
+    Bonus.ACTIONS = [ExplosionBonusAction];
 
     function Bonus(x, y, map) {
       this.x = x;

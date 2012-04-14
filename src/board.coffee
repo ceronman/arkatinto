@@ -12,26 +12,26 @@ SIDE =
 
 class Brick extends Sprite
   @IMAGES:
-    1: resource.image("graphics/brickA.png")
-    2: resource.image("graphics/brickB.png")
-    3: resource.image("graphics/brickC.png")
-    Infinity: resource.image("graphics/brickD.png")
+    "A": resource.image("graphics/brickA.png")
+    "B": resource.image("graphics/brickB.png")
+    "C": resource.image("graphics/brickC.png")
+    "D": resource.image("graphics/brickD.png")
+    "E": resource.image("graphics/brickE.png")
 
   constructor: (@x, @y, @type)->
     switch @type
       when "A" then @lifes = 1
       when "B" then @lifes = 2
       when "C" then @lifes = 3
+      when "E" then @lifes = 1
       else @lifes = Infinity
-
-    @image = Brick.IMAGES[@lifes]
+    @updateImage()
     super image: @image
 
   touch: -> @lifes--
   dead: -> @lifes <= 0
-  draw: ->
-    @image = Brick.IMAGES[@lifes]
-    super()
+  updateImage: ->
+    @image = Brick.IMAGES[@type]
 
 
 class LevelMap
@@ -72,6 +72,40 @@ class LevelMap
     @paddle.init()
     @ball.init()
 
+  removeBrickAt: (x, y) ->
+    # This is really inefficient.
+    for brick in @bricks
+      if (brick? and x > brick.left() and x < brick.right() and
+          y > brick.top() and y < brick.bottom())
+        @removeBrick(brick)
+
+  explodeBrick: (brick) ->
+    console.log "explosion"
+    # Top left
+    @removeBrickAt(brick.centerX() - brick.width(), brick.centerY() - brick.height())
+
+    # Left
+    @removeBrickAt(brick.centerX() - brick.width(), brick.centerY())
+
+    # Bottom left
+    @removeBrickAt(brick.centerX() - brick.width(), brick.centerY() + brick.height())
+
+    # Top right
+    @removeBrickAt(brick.centerX() + brick.width(), brick.centerY() - brick.height())
+
+    # Right
+    @removeBrickAt(brick.centerX() + brick.width(), brick.centerY())
+
+    # Bottom right
+    @removeBrickAt(brick.centerX() + brick.width(), brick.centerY() + brick.height())
+
+    # Top
+    @removeBrickAt(brick.centerX(), brick.centerY() - brick.height())
+
+    # Botttom
+    @removeBrickAt(brick.centerX(), brick.centerY() + brick.height())
+
+
   checkCollision: (ball) ->
     for brick in @bricks
       collisionSide = collision(ball, brick)
@@ -80,15 +114,17 @@ class LevelMap
         if brick.type != "D"
           @points += 10 * lifes
         if brick.dead()
+          if brick.type == "E"
+            @explodeBrick(brick)
           @removeBrick(brick)
+          if not @bonus? and not @activeAction?
+            @bonus = new Bonus(brick.centerX(), brick.centerY(), this)
         return [brick, collisionSide]
     return false
 
   removeBrick: (brick) ->
     index = @bricks.indexOf(brick)
     @bricks.splice(index, 1)
-    if not @bonus? and not @activeAction?
-      @bonus = new Bonus(brick.centerX(), brick.centerY(), this)
 
   removeBonus: ->
     @bonus = null
