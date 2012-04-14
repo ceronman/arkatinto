@@ -54,7 +54,7 @@ class LevelMap
     @ball = new Ball(this)
     @bonus = null
     @music = resource.sound("sounds/ride-the-storm.ogg")
-    # @music.play()
+    @music.play()
 
     @stateLabel  = new Label
       font: "20pt Arial"
