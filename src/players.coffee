@@ -2,6 +2,7 @@
 key = tinto.input.key
 resource = tinto.resource
 Sprite = tinto.sprite.Sprite
+Label = tinto.text.Label
 
 @tinto.players = do ->
 
@@ -214,6 +215,36 @@ Sprite = tinto.sprite.Sprite
         @bounceBrick(brick, side)
 
 
+  class Board
+
+    constructor: () ->
+      @lifes = CONFIG.initialLifes
+      @points = 0
+
+      @lifesLabel = new Label
+        font: "12pt Arial"
+        color: "white"
+        x: 10
+        y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4
+        text: "Vidas: #{@lifes}"
+
+      @pointsLabel = new Label
+        font: "12pt Arial"
+        color: "white"
+        x: 100
+        y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4
+        text: "Puntos: #{@points}"
+
+    draw: () ->
+      tinto.activeCanvas.preserveContext (context) =>
+        context.fillStyle = "gray"
+        context.fillRect(0, CONFIG.mapHeight,
+                         CONFIG.mapWidth, CONFIG.boardHeight)
+      @lifesLabel.draw()
+      @pointsLabel.draw()
+
+
   LevelMap: LevelMap
   Paddle: Paddle
   Ball: Ball
+  Board: Board
