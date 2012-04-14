@@ -4,8 +4,6 @@ window.onload = ->
     height: CONFIG.mapHeight
     background: 'gray'
 
-  canvas.context2D.globalAlpha = 0.5
-
   paddle = new tinto.players.Paddle()
 
   tinto.resource.loaded () ->
@@ -13,5 +11,9 @@ window.onload = ->
 
   tinto.resource.loadAll()
 
+  canvas.update (dt) ->
+    paddle.update(dt)
+
   canvas.draw () ->
+    canvas.clear()
     paddle.draw()
