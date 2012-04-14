@@ -63,19 +63,29 @@ Label = tinto.text.Label
       return SIDE.top
     console.log('unknown side')
 
-
   class Brick extends Sprite
+
+    @IMAGES:
+      1: resource.image("graphics/brickA.png")
+      2: resource.image("graphics/brickB.png")
+      3: resource.image("graphics/brickC.png")
+      Infinity: resource.image("graphics/brickD.png")
+
     constructor: (@x, @y, @type)->
-      super
-        image: resource.image("graphics/brick#{type}.png")
-        switch @type
-          when "A" then @lifes = 1
-          when "B" then @lifes = 2
-          when "C" then @lifes = 3
-          else @lifes = Infinity
+      switch @type
+        when "A" then @lifes = 1
+        when "B" then @lifes = 2
+        when "C" then @lifes = 3
+        else @lifes = Infinity
+
+      @image = Brick.IMAGES[@lifes]
+      super image: @image
 
     touch: -> @lifes--
     dead: -> @lifes <= 0
+    draw: ->
+      @image = Brick.IMAGES[@lifes]
+      super()
 
 
   class LevelMap
