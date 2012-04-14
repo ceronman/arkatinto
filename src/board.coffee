@@ -28,7 +28,14 @@ class Brick extends Sprite
     @updateImage()
     super image: @image
 
-  touch: -> @lifes--
+  touch: ->
+    @lifes--
+    switch @lifes
+      when 1 then @type = "A"
+      when 2 then @type = "B"
+      when 3 then @type = "C"
+    @updateImage()
+
   dead: -> @lifes <= 0
   updateImage: ->
     @image = Brick.IMAGES[@type]
@@ -45,7 +52,7 @@ class LevelMap
     @ball = new Ball(this)
     @bonus = null
     @music = resource.sound("sounds/ride-the-storm.ogg")
-    @music.play()
+    # @music.play()
 
     @stateLabel  = new Label
       font: "20pt Arial"
@@ -77,7 +84,8 @@ class LevelMap
   removeBrickAt: (x, y) ->
     # This is really inefficient.
     for brick in @bricks
-      if (brick? and x > brick.left() and x < brick.right() and
+      if (brick? and brick.type == "A" and
+          x > brick.left() and x < brick.right() and
           y > brick.top() and y < brick.bottom())
         @removeBrick(brick)
 

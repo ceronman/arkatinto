@@ -549,7 +549,18 @@
     }
 
     Brick.prototype.touch = function() {
-      return this.lifes--;
+      this.lifes--;
+      switch (this.lifes) {
+        case 1:
+          this.type = "A";
+          break;
+        case 2:
+          this.type = "B";
+          break;
+        case 3:
+          this.type = "C";
+      }
+      return this.updateImage();
     };
 
     Brick.prototype.dead = function() {
@@ -576,7 +587,6 @@
       this.ball = new Ball(this);
       this.bonus = null;
       this.music = resource.sound("sounds/ride-the-storm.ogg");
-      this.music.play();
       this.stateLabel = new Label({
         font: "20pt Arial",
         color: "yellow",
@@ -614,7 +624,7 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         brick = _ref[_i];
-        if ((brick != null) && x > brick.left() && x < brick.right() && y > brick.top() && y < brick.bottom()) {
+        if ((brick != null) && brick.type === "A" && x > brick.left() && x < brick.right() && y > brick.top() && y < brick.bottom()) {
           _results.push(this.removeBrick(brick));
         } else {
           _results.push(void 0);
