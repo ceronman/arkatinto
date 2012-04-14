@@ -1,5 +1,5 @@
 (function() {
-  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, FastBallBonusAction, Label, LargePadBonusAction, LevelMap, Paddle, SIDE, ShortPadBonusAction, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
+  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, FastBallBonusAction, Label, LargePadBonusAction, LevelMap, Paddle, SIDE, ShortPadBonusAction, SlowBallBonusAction, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -1137,13 +1137,43 @@
 
   })(BonusAction);
 
+  SlowBallBonusAction = (function(_super) {
+
+    __extends(SlowBallBonusAction, _super);
+
+    function SlowBallBonusAction() {
+      SlowBallBonusAction.__super__.constructor.apply(this, arguments);
+    }
+
+    SlowBallBonusAction.prototype.color = 'green';
+
+    SlowBallBonusAction.prototype.text = 'Bola lenta!';
+
+    SlowBallBonusAction.prototype.duration = 12;
+
+    SlowBallBonusAction.prototype.start = function() {
+      this.map.ball.speedX /= 2;
+      this.map.ball.speedY /= 2;
+      return this.map.ball.MAX_SPEED /= 2;
+    };
+
+    SlowBallBonusAction.prototype.end = function() {
+      this.map.ball.speedX *= 2;
+      this.map.ball.speedY *= 2;
+      return this.map.ball.MAX_SPEED *= 2;
+    };
+
+    return SlowBallBonusAction;
+
+  })(BonusAction);
+
   Bonus = (function(_super) {
 
     __extends(Bonus, _super);
 
     Bonus.IMAGE = resource.image("graphics/bonus.png");
 
-    Bonus.ACTIONS = [FastBallBonusAction];
+    Bonus.ACTIONS = [SlowBallBonusAction];
 
     function Bonus(x, y, map) {
       this.x = x;

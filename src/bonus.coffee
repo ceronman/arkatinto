@@ -113,6 +113,23 @@ class FastBallBonusAction extends BonusAction
     @map.ball.MAX_SPEED /= 2
 
 
+class SlowBallBonusAction extends BonusAction
+
+  color: 'green'
+  text: 'Bola lenta!'
+  duration: 12
+
+  start: ->
+    @map.ball.speedX /= 2
+    @map.ball.speedY /= 2
+    @map.ball.MAX_SPEED /= 2
+
+  end: ->
+    @map.ball.speedX *= 2
+    @map.ball.speedY *= 2
+    @map.ball.MAX_SPEED *= 2
+
+
 class Bonus extends Sprite
 
   @IMAGE: resource.image("graphics/bonus.png")
@@ -121,7 +138,8 @@ class Bonus extends Sprite
     # LargePadBonusAction,
     # ShortPadBonusAction,
     # ExplosionBonusAction,
-    FastBallBonusAction,
+    # FastBallBonusAction,
+    SlowBallBonusAction,
   ]
 
   constructor: (@x, @y, @map) ->
