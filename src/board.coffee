@@ -89,7 +89,6 @@ class LevelMap
     @bricks.splice(index, 1)
     if not @bonus?
       @bonus = new Bonus(brick.centerX(), brick.centerY(), this)
-      console.log @bonus
 
   removeBonus: ->
     @bonus = null
@@ -104,6 +103,9 @@ class LevelMap
 
   update: (dt) ->
     @ball.update dt
+    if @ball.state != 'playing'
+      @removeBonus()
+
     @paddle.update dt
     @bonus?.update dt
     @checkState()

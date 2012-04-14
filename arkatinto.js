@@ -1,5 +1,5 @@
 (function() {
-  var Ball, Board, Bonus, Brick, CONFIG, Label, LevelMap, Paddle, SIDE, Sprite, collision, key, resource, ﻿LEVEL1,
+  var Ball, Board, Bonus, Brick, CONFIG, ExtraLifeBonusAction, Label, LevelMap, Paddle, SIDE, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -624,8 +624,7 @@
       index = this.bricks.indexOf(brick);
       this.bricks.splice(index, 1);
       if (!(this.bonus != null)) {
-        this.bonus = new Bonus(brick.centerX(), brick.centerY(), this);
-        return console.log(this.bonus);
+        return this.bonus = new Bonus(brick.centerX(), brick.centerY(), this);
       }
     };
 
@@ -648,6 +647,7 @@
     LevelMap.prototype.update = function(dt) {
       var _ref;
       this.ball.update(dt);
+      if (this.ball.state !== 'playing') this.removeBonus();
       this.paddle.update(dt);
       if ((_ref = this.bonus) != null) _ref.update(dt);
       return this.checkState();
@@ -746,7 +746,10 @@
       if (key("left")) this.x -= this.speed * dt;
       if (key("right")) this.x += this.speed * dt;
       if (this.x < this.limitLeft) this.x = this.limitLeft;
-      if (this.x > this.limitRight) return this.x = this.limitRight;
+      if (this.x > this.limitRight) this.x = this.limitRight;
+      if ((this.map.bonus != null) && collision(this.map.bonus, this)) {
+        return this.map.bonus.executeAction();
+      }
     };
 
     return Paddle;
@@ -869,26 +872,51 @@
 
   Sprite = tinto.sprite.Sprite;
 
+  randomChoice = function(items) {
+    return items[Math.floor(Math.random() * items.length)];
+  };
+
+  ExtraLifeBonusAction = (function() {
+
+    function ExtraLifeBonusAction() {}
+
+    ExtraLifeBonusAction.prototype.execute = function(map) {
+      return map.lifes++;
+    };
+
+    return ExtraLifeBonusAction;
+
+  })();
+
   Bonus = (function(_super) {
 
     __extends(Bonus, _super);
 
     Bonus.IMAGE = resource.image("graphics/bonus.png");
 
+    Bonus.ACTIONS = [ExtraLifeBonusAction];
+
     function Bonus(x, y, map) {
+      var BonusAction;
       this.x = x;
       this.y = y;
       this.map = map;
-      console.log(this.x, this.y);
       Bonus.__super__.constructor.call(this, {
         image: Bonus.IMAGE
       });
       this.speed = 50;
+      BonusAction = randomChoice(Bonus.ACTIONS);
+      this.action = new BonusAction();
     }
 
     Bonus.prototype.update = function(dt) {
       this.y += this.speed * dt;
       if (this.y > CONFIG.mapWidth) return this.map.removeBonus();
+    };
+
+    Bonus.prototype.executeAction = function() {
+      this.action.execute(this.map);
+      return this.map.removeBonus();
     };
 
     return Bonus;

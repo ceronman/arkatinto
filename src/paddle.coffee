@@ -30,3 +30,6 @@ class Paddle extends Sprite
 
     if @x > @limitRight
       @x = @limitRight
+
+    if @map.bonus? and collision(@map.bonus, this)
+      @map.bonus.executeAction()
