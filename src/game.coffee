@@ -25,6 +25,7 @@ window.onload = ->
   canvas.update (dt) ->
     paddle.update dt
     ball.update dt, paddle, levelMap
+    board.update dt
 
   canvas.draw () ->
     canvas.clear()

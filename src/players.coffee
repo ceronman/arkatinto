@@ -150,10 +150,12 @@ Label = tinto.text.Label
       super
         image: resource.image("graphics/ball.png")
 
-      @MAX_SPEED = 200
+      @MAX_SPEED = 300
 
-      @speedX = 100
-      @speedY = -100
+      @speedX = 200
+      @speedY = -200
+
+      @state = 'ready'
 
     center: ->
       @x = CONFIG.mapWidth / 2 - @width() / 2
@@ -188,6 +190,18 @@ Label = tinto.text.Label
         @speedY *= -1
 
     update: (dt, paddle, map) ->
+      switch @state
+        when "playing" then @updatePlaying dt, paddle, map
+        when "ready" then @updateReady dt, paddle, map
+
+    updateReady: (dt, paddle, map) ->
+      @x = paddle.centerX() - @width() / 2
+      @y = paddle.top() - @height()
+
+      if key("space")
+        @state = "playing"
+
+    updatePlaying: (dt, paddle, map) ->
       @x += @speedX * dt
       @y += @speedY * dt
 
@@ -209,6 +223,7 @@ Label = tinto.text.Label
 
       if @y > @limitBottom
         @center()
+        @state = "ready"
 
       [brick, side] = map.checkCollision(this)
       if side
@@ -234,6 +249,10 @@ Label = tinto.text.Label
         x: 100
         y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4
         text: "Puntos: #{@points}"
+
+    update: (dt) ->
+      @lifesLabel.text = "Vidas: #{@lifes}"
+      @pointsLabel.text = "Puntos: #{@points}"
 
     draw: () ->
       tinto.activeCanvas.preserveContext (context) =>
