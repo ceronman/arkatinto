@@ -67,7 +67,11 @@ Sprite = tinto.sprite.Sprite
     constructor: (@x, @y, @type)->
       super
         image: resource.image("graphics/brick#{type}.png")
-        @lifes = 1
+        switch @type
+          when "A" then @lifes = 1
+          when "B" then @lifes = 2
+          when "C" then @lifes = 3
+          else @lifes = Infinity
 
     touch: -> @lifes--
     dead: -> @lifes <= 0
