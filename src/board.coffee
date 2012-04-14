@@ -43,6 +43,7 @@ class LevelMap
     @paddle = new Paddle(this)
     @board = new Board(this)
     @ball = new Ball(this)
+    @bonus = null
 
     @stateLabel  = new Label
       font: "20pt Arial"
@@ -86,18 +87,25 @@ class LevelMap
   removeBrick: (brick) ->
     index = @bricks.indexOf(brick)
     @bricks.splice(index, 1)
+    if not @bonus?
+      @bonus = new Bonus(brick.centerX(), brick.centerY(), this)
+      console.log @bonus
+
+  removeBonus: ->
+    @bonus = null
 
   die: -> @lifes--
 
   checkState: ->
     if @lifes < 0
       @ball.state = "lost"
-      @stateLabel.text = "GAME OVER"
+      @stateLabel.text = "GAME OVER. <F5> para reiniciar."
       @stateLabel.color = "red"
 
   update: (dt) ->
     @ball.update dt
     @paddle.update dt
+    @bonus?.update dt
     @checkState()
 
   draw: ->
@@ -105,6 +113,7 @@ class LevelMap
       brick.draw()
     @board.draw()
     @ball.draw()
+    @bonus?.draw()
     @paddle.draw()
 
     if @ball.state != "playing"

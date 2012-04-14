@@ -1,5 +1,5 @@
 (function() {
-  var Ball, Board, Brick, CONFIG, Label, LevelMap, Paddle, SIDE, Sprite, collision, key, resource, ﻿LEVEL1,
+  var Ball, Board, Bonus, Brick, CONFIG, Label, LevelMap, Paddle, SIDE, Sprite, collision, key, resource, ﻿LEVEL1,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -571,6 +571,7 @@
       this.paddle = new Paddle(this);
       this.board = new Board(this);
       this.ball = new Ball(this);
+      this.bonus = null;
       this.stateLabel = new Label({
         font: "20pt Arial",
         color: "yellow",
@@ -621,7 +622,15 @@
     LevelMap.prototype.removeBrick = function(brick) {
       var index;
       index = this.bricks.indexOf(brick);
-      return this.bricks.splice(index, 1);
+      this.bricks.splice(index, 1);
+      if (!(this.bonus != null)) {
+        this.bonus = new Bonus(brick.centerX(), brick.centerY(), this);
+        return console.log(this.bonus);
+      }
+    };
+
+    LevelMap.prototype.removeBonus = function() {
+      return this.bonus = null;
     };
 
     LevelMap.prototype.die = function() {
@@ -631,19 +640,21 @@
     LevelMap.prototype.checkState = function() {
       if (this.lifes < 0) {
         this.ball.state = "lost";
-        this.stateLabel.text = "GAME OVER";
+        this.stateLabel.text = "GAME OVER. <F5> para reiniciar.";
         return this.stateLabel.color = "red";
       }
     };
 
     LevelMap.prototype.update = function(dt) {
+      var _ref;
       this.ball.update(dt);
       this.paddle.update(dt);
+      if ((_ref = this.bonus) != null) _ref.update(dt);
       return this.checkState();
     };
 
     LevelMap.prototype.draw = function() {
-      var brick, _i, _len, _ref;
+      var brick, _i, _len, _ref, _ref2;
       _ref = this.bricks;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         brick = _ref[_i];
@@ -651,6 +662,7 @@
       }
       this.board.draw();
       this.ball.draw();
+      if ((_ref2 = this.bonus) != null) _ref2.draw();
       this.paddle.draw();
       if (this.ball.state !== "playing") return this.stateLabel.draw();
     };
@@ -848,6 +860,38 @@
     };
 
     return Ball;
+
+  })(Sprite);
+
+  key = tinto.input.key;
+
+  resource = tinto.resource;
+
+  Sprite = tinto.sprite.Sprite;
+
+  Bonus = (function(_super) {
+
+    __extends(Bonus, _super);
+
+    Bonus.IMAGE = resource.image("graphics/bonus.png");
+
+    function Bonus(x, y, map) {
+      this.x = x;
+      this.y = y;
+      this.map = map;
+      console.log(this.x, this.y);
+      Bonus.__super__.constructor.call(this, {
+        image: Bonus.IMAGE
+      });
+      this.speed = 50;
+    }
+
+    Bonus.prototype.update = function(dt) {
+      this.y += this.speed * dt;
+      if (this.y > CONFIG.mapWidth) return this.map.removeBonus();
+    };
+
+    return Bonus;
 
   })(Sprite);
 

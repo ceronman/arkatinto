@@ -12,6 +12,7 @@ SOURCES = src/config.coffee \
           src/board.coffee \
           src/paddle.coffee \
           src/ball.coffee \
+          src/bonus.coffee \
           src/game.coffee
 
 build:
