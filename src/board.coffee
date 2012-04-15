@@ -49,6 +49,7 @@ class LevelMap
     @paddle = new Paddle(this)
     @board = new Board(this)
     @ball = new Ball(this)
+
     @music = resource.sound("sounds/ride-the-storm.ogg")
     @bricks = []
     @bonus = null
@@ -63,6 +64,7 @@ class LevelMap
       text: "Presione 'espacio' para lanzar"
 
   init: (content) ->
+    @music.play()
     @bricks = []
     @lifes = 3
     @points = 0
@@ -155,12 +157,23 @@ class LevelMap
         return
 
     @ball.state = "win"
-    @ball.state = "lost"
+    @ball.state = "win"
     @stateLabel.text = "GANASTE!"
     @stateLabel.color = "green"
 
 
   update: (dt) ->
+    if key('w')
+      for brick in @bricks
+        @removeBrick(brick)
+
+    if @ball.state == "win"
+      if key('space')
+        @currentLevel++
+        if @currentLevel <= CONFIG.maxLevel
+          @init(LEVELS[@currentLevel])
+      return
+
     if (@ball.state == "playing" and key("space") and
         @activeAction? and @activeAction.powerAction)
       @activeAction.action()

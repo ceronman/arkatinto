@@ -5,3 +5,4 @@ CONFIG =
   cellWidth: 35
   cellHeight: 20
   initialLifes: 3
+  maxLevel: 3

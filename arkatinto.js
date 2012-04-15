@@ -9,7 +9,8 @@
     boardHeight: 20,
     cellWidth: 35,
     cellHeight: 20,
-    initialLifes: 3
+    initialLifes: 3,
+    maxLevel: 3
   };
 
   this.tinto = (function() {
@@ -610,6 +611,7 @@
 
     LevelMap.prototype.init = function(content) {
       var brick, bricks, col, line, lines, row, type, x, y, _ref, _ref2;
+      this.music.play();
       this.bricks = [];
       this.lifes = 3;
       this.points = 0;
@@ -708,20 +710,36 @@
         if (brick.type !== "D") return;
       }
       this.ball.state = "win";
-      this.ball.state = "lost";
+      this.ball.state = "win";
       this.stateLabel.text = "GANASTE!";
       return this.stateLabel.color = "green";
     };
 
     LevelMap.prototype.update = function(dt) {
-      var _ref;
+      var brick, _i, _len, _ref, _ref2;
+      if (key('w')) {
+        _ref = this.bricks;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          brick = _ref[_i];
+          this.removeBrick(brick);
+        }
+      }
+      if (this.ball.state === "win") {
+        if (key('space')) {
+          this.currentLevel++;
+          if (this.currentLevel <= CONFIG.maxLevel) {
+            this.init(LEVELS[this.currentLevel]);
+          }
+        }
+        return;
+      }
       if (this.ball.state === "playing" && key("space") && (this.activeAction != null) && this.activeAction.powerAction) {
         this.activeAction.action();
       }
       this.ball.update(dt);
       if (this.ball.state !== 'playing') this.removeBonus();
       this.paddle.update(dt);
-      if ((_ref = this.bonus) != null) _ref.update(dt);
+      if ((_ref2 = this.bonus) != null) _ref2.update(dt);
       return this.checkState();
     };
 
