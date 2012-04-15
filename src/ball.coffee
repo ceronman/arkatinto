@@ -59,6 +59,10 @@ class Ball extends Sprite
     @y = paddle.top() - @height()
 
     if key("space")
+      if paddle.sticky
+        # FIXME
+        @map.activeAction.stop()
+        @map.activeAction = null
       @state = "playing"
 
   updatePlaying: (dt) ->
@@ -80,7 +84,11 @@ class Ball extends Sprite
       @speedY *= -1
 
     if collision(this, paddle) == SIDE.top
-      @bouncePaddle(paddle)
+      if paddle.sticky
+        @init()
+        @state = "ready"
+      else
+        @bouncePaddle(paddle)
 
     if @y > @limitBottom
       @init()

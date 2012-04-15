@@ -12,6 +12,7 @@ class Paddle extends Sprite
 
     @speed = 300
     @mirror = false
+    @sticky = false
 
   init: ->
     @x = CONFIG.mapWidth / 2 - @width() / 2

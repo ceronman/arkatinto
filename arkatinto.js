@@ -1,5 +1,5 @@
 (function() {
-  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, FastBallBonusAction, FireBallBonusAction, Label, LargePadBonusAction, LevelMap, MirrorControlBonusAction, Paddle, SIDE, ShortPadBonusAction, SlowBallBonusAction, Sprite, collision, key, randomChoice, resource, ﻿LEVEL1,
+  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, FastBallBonusAction, FireBallBonusAction, Label, LargePadBonusAction, LevelMap, MirrorControlBonusAction, Paddle, SIDE, ShortPadBonusAction, SlowBallBonusAction, Sprite, StickyPaddleBonusAction, collision, key, randomChoice, resource, ﻿LEVEL1,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -497,6 +497,8 @@
     return console.log('unknown side');
   };
 
+  key = tinto.input.key;
+
   resource = tinto.resource;
 
   Sprite = tinto.sprite.Sprite;
@@ -590,7 +592,6 @@
       this.ball = new Ball(this);
       this.bonus = null;
       this.music = resource.sound("sounds/ride-the-storm.ogg");
-      this.music.play();
       this.stateLabel = new Label({
         font: "20pt Arial",
         color: "yellow",
@@ -698,6 +699,9 @@
       if (this.ball.state !== 'playing') this.removeBonus();
       this.paddle.update(dt);
       if ((_ref = this.bonus) != null) _ref.update(dt);
+      if (this.ball.state === "playing" && key("space") && (this.activeAction != null) && this.activeAction.powerAction) {
+        this.activeAction.action();
+      }
       return this.checkState();
     };
 
@@ -747,7 +751,7 @@
       });
       this.bonusLabel = new Label({
         font: "12pt Arial",
-        x: 200,
+        x: 180,
         y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4,
         text: ""
       });
@@ -795,6 +799,7 @@
       });
       this.speed = 300;
       this.mirror = false;
+      this.sticky = false;
     }
 
     Paddle.prototype.init = function() {
@@ -898,7 +903,13 @@
       paddle = this.map.paddle;
       this.x = paddle.centerX() - this.width() / 2;
       this.y = paddle.top() - this.height();
-      if (key("space")) return this.state = "playing";
+      if (key("space")) {
+        if (paddle.sticky) {
+          this.map.activeAction.stop();
+          this.map.activeAction = null;
+        }
+        return this.state = "playing";
+      }
     };
 
     Ball.prototype.updatePlaying = function(dt) {
@@ -918,7 +929,14 @@
         this.y = this.limitTop;
         this.speedY *= -1;
       }
-      if (collision(this, paddle) === SIDE.top) this.bouncePaddle(paddle);
+      if (collision(this, paddle) === SIDE.top) {
+        if (paddle.sticky) {
+          this.init();
+          this.state = "ready";
+        } else {
+          this.bouncePaddle(paddle);
+        }
+      }
       if (this.y > this.limitBottom) {
         this.init();
         this.map.die();
@@ -950,10 +968,12 @@
       var _this = this;
       this.map = map;
       this.start();
-      return setTimeout((function() {
-        _this.end();
-        return _this.map.activeAction = null;
-      }), this.duration * 1000);
+      if (this.duration != null) {
+        return setTimeout((function() {
+          _this.end();
+          return _this.map.activeAction = null;
+        }), this.duration * 1000);
+      }
     };
 
     BonusAction.prototype.remove = function() {
@@ -1235,13 +1255,51 @@
 
   })(BonusAction);
 
+  StickyPaddleBonusAction = (function(_super) {
+
+    __extends(StickyPaddleBonusAction, _super);
+
+    function StickyPaddleBonusAction() {
+      StickyPaddleBonusAction.__super__.constructor.apply(this, arguments);
+    }
+
+    StickyPaddleBonusAction.IMAGE = resource.image("graphics/sticky_paddle.png");
+
+    StickyPaddleBonusAction.prototype.powerAction = true;
+
+    StickyPaddleBonusAction.prototype.duration = null;
+
+    StickyPaddleBonusAction.prototype.color = 'purple';
+
+    StickyPaddleBonusAction.prototype.text = 'Atrapar: <espacio>';
+
+    StickyPaddleBonusAction.prototype.start = function() {
+      return this.oldImage = this.map.paddle.image;
+    };
+
+    StickyPaddleBonusAction.prototype.end = function() {};
+
+    StickyPaddleBonusAction.prototype.action = function() {
+      this.map.paddle.image = StickyPaddleBonusAction.IMAGE;
+      return this.map.paddle.sticky = true;
+    };
+
+    StickyPaddleBonusAction.prototype.stop = function() {
+      this.map.paddle.image = this.oldImage;
+      return this.map.paddle.sticky = false;
+    };
+
+    return StickyPaddleBonusAction;
+
+  })(BonusAction);
+
   Bonus = (function(_super) {
 
     __extends(Bonus, _super);
 
     Bonus.IMAGE = resource.image("graphics/bonus.png");
 
-    Bonus.ACTIONS = [ExtraLifeBonusAction, LargePadBonusAction, ShortPadBonusAction, ExplosionBonusAction, FastBallBonusAction, SlowBallBonusAction, FireBallBonusAction, MirrorControlBonusAction];
+    Bonus.ACTIONS = [StickyPaddleBonusAction];
 
     function Bonus(x, y, map) {
       this.x = x;

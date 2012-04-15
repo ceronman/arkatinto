@@ -1,4 +1,5 @@
 # Imports
+key = tinto.input.key
 resource = tinto.resource
 Sprite = tinto.sprite.Sprite
 Label = tinto.text.Label
@@ -54,7 +55,7 @@ class LevelMap
     @ball = new Ball(this)
     @bonus = null
     @music = resource.sound("sounds/ride-the-storm.ogg")
-    @music.play()
+    # @music.play()
 
     @stateLabel  = new Label
       font: "20pt Arial"
@@ -155,6 +156,11 @@ class LevelMap
 
     @paddle.update dt
     @bonus?.update dt
+
+    if (@ball.state == "playing" and key("space") and
+        @activeAction? and @activeAction.powerAction)
+      @activeAction.action()
+
     @checkState()
 
   draw: ->
@@ -195,7 +201,7 @@ class Board
 
     @bonusLabel = new Label
       font: "12pt Arial"
-      x: 200
+      x: 180
       y: CONFIG.mapHeight + 3 * CONFIG.boardHeight / 4
       text: ""
 

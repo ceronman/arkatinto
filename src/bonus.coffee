@@ -11,10 +11,11 @@ class BonusAction
   execute: (map) ->
     @map = map
     @start()
-    setTimeout((=>
-      @end()
-      @map.activeAction = null
-      ), @duration * 1000)
+    if @duration?
+      setTimeout((=>
+        @end()
+        @map.activeAction = null
+        ), @duration * 1000)
 
   remove: ->
     @end()
@@ -166,18 +167,41 @@ class MirrorControlBonusAction extends BonusAction
     @map.paddle.mirror = false
 
 
+class StickyPaddleBonusAction extends BonusAction
+
+  @IMAGE = resource.image("graphics/sticky_paddle.png")
+  powerAction: true
+  duration: null
+
+  color: 'purple'
+  text: 'Atrapar: <espacio>'
+
+  start: ->
+    @oldImage = @map.paddle.image
+  end: ->
+
+  action: ->
+    @map.paddle.image = StickyPaddleBonusAction.IMAGE
+    @map.paddle.sticky = true
+
+  stop: ->
+    @map.paddle.image = @oldImage
+    @map.paddle.sticky = false
+
+
 class Bonus extends Sprite
 
   @IMAGE: resource.image("graphics/bonus.png")
   @ACTIONS: [
-    ExtraLifeBonusAction,
-    LargePadBonusAction,
-    ShortPadBonusAction,
-    ExplosionBonusAction,
-    FastBallBonusAction,
-    SlowBallBonusAction,
-    FireBallBonusAction,
-    MirrorControlBonusAction,
+    # ExtraLifeBonusAction,
+    # LargePadBonusAction,
+    # ShortPadBonusAction,
+    # ExplosionBonusAction,
+    # FastBallBonusAction,
+    # SlowBallBonusAction,
+    # FireBallBonusAction,
+    # MirrorControlBonusAction,
+    StickyPaddleBonusAction
   ]
 
   constructor: (@x, @y, @map) ->
