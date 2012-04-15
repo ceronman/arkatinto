@@ -687,11 +687,21 @@
     };
 
     LevelMap.prototype.checkState = function() {
+      var brick, _i, _len, _ref;
       if (this.lifes < 0) {
         this.ball.state = "lost";
-        this.stateLabel.text = "GAME OVER. <F5> para reiniciar.";
-        return this.stateLabel.color = "red";
+        this.stateLabel.text = "GAME OVER";
+        this.stateLabel.color = "red";
       }
+      _ref = this.bricks;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        brick = _ref[_i];
+        if (brick.type !== "D") return;
+      }
+      this.ball.state = "win";
+      this.ball.state = "lost";
+      this.stateLabel.text = "GANASTE!";
+      return this.stateLabel.color = "green";
     };
 
     LevelMap.prototype.update = function(dt) {
@@ -1056,7 +1066,7 @@
       ExtraLifeBonusAction.__super__.constructor.apply(this, arguments);
     }
 
-    ExtraLifeBonusAction.prototype.color = 'green';
+    ExtraLifeBonusAction.prototype.color = 'lightgreen';
 
     ExtraLifeBonusAction.prototype.text = 'Vida Extra!';
 
@@ -1082,7 +1092,7 @@
 
     LargePadBonusAction.IMAGE = resource.image("graphics/paddle_large.png");
 
-    LargePadBonusAction.prototype.color = 'green';
+    LargePadBonusAction.prototype.color = 'lightgreen';
 
     LargePadBonusAction.prototype.text = 'Agrandar!';
 
@@ -1154,7 +1164,7 @@
       ExplosionBonusAction.__super__.constructor.apply(this, arguments);
     }
 
-    ExplosionBonusAction.prototype.color = 'green';
+    ExplosionBonusAction.prototype.color = 'lightgreen';
 
     ExplosionBonusAction.prototype.text = 'Bloques explosivos!';
 
@@ -1234,7 +1244,7 @@
       SlowBallBonusAction.__super__.constructor.apply(this, arguments);
     }
 
-    SlowBallBonusAction.prototype.color = 'green';
+    SlowBallBonusAction.prototype.color = 'lightgreen';
 
     SlowBallBonusAction.prototype.text = 'Bola lenta!';
 
@@ -1266,7 +1276,7 @@
 
     FireBallBonusAction.IMAGE = resource.image("graphics/fireball.png");
 
-    FireBallBonusAction.prototype.color = 'green';
+    FireBallBonusAction.prototype.color = 'lightgreen';
 
     FireBallBonusAction.prototype.text = 'Bola de fuego!';
 
@@ -1435,12 +1445,21 @@
   Label = tinto.text.Label;
 
   window.onload = function() {
-    var canvas, levelMap;
+    var canvas, levelMap, loading;
     canvas = new tinto.canvas.GameCanvas('gamecanvas', {
       width: CONFIG.mapWidth,
       height: CONFIG.mapHeight + CONFIG.boardHeight,
       background: 'black'
     });
+    loading = new Label({
+      font: "28pt Arial",
+      color: "red",
+      x: CONFIG.mapWidth / 2,
+      y: CONFIG.mapHeight / 2,
+      alignment: "center",
+      text: "Loading..."
+    });
+    loading.draw();
     levelMap = new LevelMap(LEVEL1);
     tinto.resource.loaded(function() {
       return levelMap.init();

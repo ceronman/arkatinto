@@ -146,8 +146,18 @@ class LevelMap
   checkState: ->
     if @lifes < 0
       @ball.state = "lost"
-      @stateLabel.text = "GAME OVER. <F5> para reiniciar."
+      @stateLabel.text = "GAME OVER"
       @stateLabel.color = "red"
+
+    for brick in @bricks
+      if brick.type != "D"
+        return
+
+    @ball.state = "win"
+    @ball.state = "lost"
+    @stateLabel.text = "GANASTE!"
+    @stateLabel.color = "green"
+
 
   update: (dt) ->
     if (@ball.state == "playing" and key("space") and

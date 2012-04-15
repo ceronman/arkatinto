@@ -24,7 +24,7 @@ class BonusAction
 
 class ExtraLifeBonusAction extends BonusAction
 
-  color: 'green'
+  color: 'lightgreen'
   text: 'Vida Extra!'
   duration: 2
 
@@ -38,7 +38,7 @@ class LargePadBonusAction extends BonusAction
 
   @IMAGE = resource.image("graphics/paddle_large.png")
 
-  color: 'green'
+  color: 'lightgreen'
   text: 'Agrandar!'
   duration: 12
 
@@ -80,7 +80,7 @@ class ShortPadBonusAction extends BonusAction
 
 class ExplosionBonusAction extends BonusAction
 
-  color: 'green'
+  color: 'lightgreen'
   text: 'Bloques explosivos!'
   duration: 10
 
@@ -116,7 +116,7 @@ class FastBallBonusAction extends BonusAction
 
 class SlowBallBonusAction extends BonusAction
 
-  color: 'green'
+  color: 'lightgreen'
   text: 'Bola lenta!'
   duration: 10
 
@@ -135,7 +135,7 @@ class FireBallBonusAction extends BonusAction
 
   @IMAGE = resource.image("graphics/fireball.png")
 
-  color: 'green'
+  color: 'lightgreen'
   text: 'Bola de fuego!'
   duration: 10
 

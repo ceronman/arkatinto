@@ -10,6 +10,16 @@ window.onload = ->
     height: CONFIG.mapHeight + CONFIG.boardHeight
     background: 'black'
 
+  loading = new Label
+    font: "28pt Arial"
+    color: "red"
+    x: CONFIG.mapWidth / 2
+    y: CONFIG.mapHeight / 2
+    alignment: "center"
+    text: "Loading..."
+
+  loading.draw()
+
   levelMap = new LevelMap(LEVEL1)
 
   tinto.resource.loaded () ->
