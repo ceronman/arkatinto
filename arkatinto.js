@@ -1,5 +1,5 @@
 (function() {
-  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, FastBallBonusAction, FireBallBonusAction, Label, LargePadBonusAction, LevelMap, MirrorControlBonusAction, Paddle, SIDE, ShortPadBonusAction, SlowBallBonusAction, Sprite, StickyPaddleBonusAction, collision, key, randomChoice, resource, ﻿LEVEL1,
+  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, FastBallBonusAction, FireBallBonusAction, Label, LargePadBonusAction, LevelMap, MirrorControlBonusAction, Missile, MissileBonusAction, Paddle, SIDE, ShortPadBonusAction, SlowBallBonusAction, Sprite, StickyPaddleBonusAction, collision, key, randomChoice, resource, ﻿LEVEL1,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -695,13 +695,13 @@
 
     LevelMap.prototype.update = function(dt) {
       var _ref;
+      if (this.ball.state === "playing" && key("space") && (this.activeAction != null) && this.activeAction.powerAction) {
+        this.activeAction.action();
+      }
       this.ball.update(dt);
       if (this.ball.state !== 'playing') this.removeBonus();
       this.paddle.update(dt);
       if ((_ref = this.bonus) != null) _ref.update(dt);
-      if (this.ball.state === "playing" && key("space") && (this.activeAction != null) && this.activeAction.powerAction) {
-        this.activeAction.action();
-      }
       return this.checkState();
     };
 
@@ -800,6 +800,7 @@
       this.speed = 300;
       this.mirror = false;
       this.sticky = false;
+      this.missiles = [];
     }
 
     Paddle.prototype.init = function() {
@@ -810,7 +811,7 @@
     };
 
     Paddle.prototype.update = function(dt) {
-      var leftKey, rightKey;
+      var leftKey, missile, rightKey, _i, _len, _ref, _results;
       leftKey = this.mirror ? "right" : "left";
       rightKey = this.mirror ? "left" : "right";
       if (key(leftKey)) this.x -= this.speed * dt;
@@ -818,11 +819,72 @@
       if (this.x < this.limitLeft) this.x = this.limitLeft;
       if (this.x > this.limitRight) this.x = this.limitRight;
       if ((this.map.bonus != null) && collision(this.map.bonus, this)) {
-        return this.map.bonus.executeAction();
+        this.map.bonus.executeAction();
       }
+      _ref = this.missiles;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        missile = _ref[_i];
+        _results.push(missile.update(dt));
+      }
+      return _results;
+    };
+
+    Paddle.prototype.draw = function() {
+      var missile, _i, _len, _ref, _results;
+      Paddle.__super__.draw.call(this);
+      _ref = this.missiles;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        missile = _ref[_i];
+        _results.push(missile.draw());
+      }
+      return _results;
+    };
+
+    Paddle.prototype.shoot = function() {
+      var missile1, missile2;
+      if (this.missiles.length !== 0) return;
+      missile1 = new Missile(this.map);
+      missile2 = new Missile(this.map);
+      missile1.shoot(SIDE.left);
+      missile2.shoot(SIDE.right);
+      return this.missiles = [missile1, missile2];
     };
 
     return Paddle;
+
+  })(Sprite);
+
+  Missile = (function(_super) {
+
+    __extends(Missile, _super);
+
+    Missile.IMAGE = resource.image("graphics/missile.png");
+
+    function Missile(map) {
+      this.map = map;
+      Missile.__super__.constructor.call(this, {
+        image: Missile.IMAGE
+      });
+      this.speed = -400;
+    }
+
+    Missile.prototype.shoot = function(side) {
+      if (side === SIDE.left) {
+        this.x = this.map.paddle.left() + 5;
+      } else {
+        this.x = this.map.paddle.right() - 5;
+      }
+      return this.y = this.map.paddle.top();
+    };
+
+    Missile.prototype.update = function(dt) {
+      this.y += this.speed * dt;
+      if (this.bottom() < 0) return this.map.paddle.missiles = [];
+    };
+
+    return Missile;
 
   })(Sprite);
 
@@ -1293,13 +1355,48 @@
 
   })(BonusAction);
 
+  MissileBonusAction = (function(_super) {
+
+    __extends(MissileBonusAction, _super);
+
+    function MissileBonusAction() {
+      MissileBonusAction.__super__.constructor.apply(this, arguments);
+    }
+
+    MissileBonusAction.IMAGE = resource.image("graphics/battle_paddle.png");
+
+    MissileBonusAction.prototype.color = 'purple';
+
+    MissileBonusAction.prototype.text = 'Disparar: <espacio>!';
+
+    MissileBonusAction.prototype.duration = 12;
+
+    MissileBonusAction.prototype.powerAction = true;
+
+    MissileBonusAction.prototype.start = function() {
+      this.oldImage = this.map.paddle.image;
+      return this.map.paddle.image = MissileBonusAction.IMAGE;
+    };
+
+    MissileBonusAction.prototype.end = function() {
+      return this.map.paddle.image = this.oldImage;
+    };
+
+    MissileBonusAction.prototype.action = function() {
+      return this.map.paddle.shoot();
+    };
+
+    return MissileBonusAction;
+
+  })(BonusAction);
+
   Bonus = (function(_super) {
 
     __extends(Bonus, _super);
 
     Bonus.IMAGE = resource.image("graphics/bonus.png");
 
-    Bonus.ACTIONS = [StickyPaddleBonusAction];
+    Bonus.ACTIONS = [MissileBonusAction];
 
     function Bonus(x, y, map) {
       this.x = x;

@@ -150,6 +150,10 @@ class LevelMap
       @stateLabel.color = "red"
 
   update: (dt) ->
+    if (@ball.state == "playing" and key("space") and
+        @activeAction? and @activeAction.powerAction)
+      @activeAction.action()
+
     @ball.update dt
     if @ball.state != 'playing'
       @removeBonus()
@@ -157,9 +161,6 @@ class LevelMap
     @paddle.update dt
     @bonus?.update dt
 
-    if (@ball.state == "playing" and key("space") and
-        @activeAction? and @activeAction.powerAction)
-      @activeAction.action()
 
     @checkState()
 

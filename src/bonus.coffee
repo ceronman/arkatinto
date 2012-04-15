@@ -189,6 +189,26 @@ class StickyPaddleBonusAction extends BonusAction
     @map.paddle.sticky = false
 
 
+class MissileBonusAction extends BonusAction
+
+  @IMAGE = resource.image("graphics/battle_paddle.png")
+
+  color: 'purple'
+  text: 'Disparar: <espacio>!'
+  duration: 12
+  powerAction: true
+
+  start: ->
+    @oldImage = @map.paddle.image
+    @map.paddle.image = MissileBonusAction.IMAGE
+
+  end: ->
+    @map.paddle.image = @oldImage
+
+  action: ->
+    @map.paddle.shoot()
+
+
 class Bonus extends Sprite
 
   @IMAGE: resource.image("graphics/bonus.png")
@@ -201,7 +221,8 @@ class Bonus extends Sprite
     # SlowBallBonusAction,
     # FireBallBonusAction,
     # MirrorControlBonusAction,
-    StickyPaddleBonusAction
+    # StickyPaddleBonusAction,
+    MissileBonusAction
   ]
 
   constructor: (@x, @y, @map) ->
