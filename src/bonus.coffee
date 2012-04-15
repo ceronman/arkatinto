@@ -213,15 +213,15 @@ class Bonus extends Sprite
 
   @IMAGE: resource.image("graphics/bonus.png")
   @ACTIONS: [
-    # ExtraLifeBonusAction,
-    # LargePadBonusAction,
-    # ShortPadBonusAction,
-    # ExplosionBonusAction,
-    # FastBallBonusAction,
-    # SlowBallBonusAction,
-    # FireBallBonusAction,
-    # MirrorControlBonusAction,
-    # StickyPaddleBonusAction,
+    ExtraLifeBonusAction,
+    LargePadBonusAction,
+    ShortPadBonusAction,
+    ExplosionBonusAction,
+    FastBallBonusAction,
+    SlowBallBonusAction,
+    FireBallBonusAction,
+    MirrorControlBonusAction,
+    StickyPaddleBonusAction,
     MissileBonusAction
   ]
 

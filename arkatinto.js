@@ -592,6 +592,7 @@
       this.ball = new Ball(this);
       this.bonus = null;
       this.music = resource.sound("sounds/ride-the-storm.ogg");
+      this.music.play();
       this.stateLabel = new Label({
         font: "20pt Arial",
         color: "yellow",
@@ -1396,7 +1397,7 @@
 
     Bonus.IMAGE = resource.image("graphics/bonus.png");
 
-    Bonus.ACTIONS = [MissileBonusAction];
+    Bonus.ACTIONS = [ExtraLifeBonusAction, LargePadBonusAction, ShortPadBonusAction, ExplosionBonusAction, FastBallBonusAction, SlowBallBonusAction, FireBallBonusAction, MirrorControlBonusAction, StickyPaddleBonusAction, MissileBonusAction];
 
     function Bonus(x, y, map) {
       this.x = x;
