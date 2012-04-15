@@ -1,5 +1,5 @@
 (function() {
-  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, FastBallBonusAction, FireBallBonusAction, Label, LargePadBonusAction, LevelMap, MirrorControlBonusAction, Missile, MissileBonusAction, Paddle, SIDE, ShortPadBonusAction, SlowBallBonusAction, Sprite, StickyPaddleBonusAction, collision, key, randomChoice, resource, ﻿LEVEL1,
+  var Ball, Board, Bonus, BonusAction, Brick, CONFIG, ExplosionBonusAction, ExtraLifeBonusAction, FastBallBonusAction, FireBallBonusAction, LEVEL1, LEVEL2, LEVEL3, LEVELS, Label, LargePadBonusAction, LevelMap, MirrorControlBonusAction, Missile, MissileBonusAction, Paddle, SIDE, ShortPadBonusAction, SlowBallBonusAction, Sprite, StickyPaddleBonusAction, collision, key, randomChoice, resource, ﻿LEVEL0,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -448,7 +448,15 @@
     };
   })();
 
-  ﻿LEVEL1 = "mapa base\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,A,A,A,X,X,X,X,X\nX,X,X,X,X,X,A,X,X,X,X,X,X\nX,A,A,A,A,X,B,X,A,A,A,A,X\nX,A,A,A,A,X,A,X,A,A,A,A,X\nA,X,X,X,X,X,X,X,X,X,X,X,X\nA,X,A,A,X,A,A,A,X,A,A,X,A\nA,C,X,A,X,A,A,A,X,C,X,A,A\nA,A,X,X,X,X,X,X,X,X,X,A,A\nX,X,A,A,A,A,B,A,A,A,X,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,D,A,A,X,X,A,X,X,A,A,D,X\nX,X,A,A,X,A,A,A,X,A,A,X,X\nX,X,X,X,X,A,E,A,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X";
+  ﻿LEVEL0 = "mapa base\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,A,A,A,X,X,X,X,X\nX,X,X,X,X,X,A,X,X,X,X,X,X\nX,A,A,A,A,X,B,X,A,A,A,A,X\nX,A,A,A,A,X,A,X,A,A,A,A,X\nA,X,X,X,X,X,X,X,X,X,X,X,X\nA,X,A,A,X,A,A,A,X,A,A,X,A\nA,C,X,A,X,A,A,A,X,C,X,A,A\nA,A,X,X,X,X,X,X,X,X,X,A,A\nX,X,A,A,A,A,B,A,A,A,X,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,D,A,A,X,X,A,X,X,A,A,D,X\nX,X,A,A,X,A,A,A,X,A,A,X,X\nX,X,X,X,X,A,E,A,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X";
+
+  LEVEL1 = "mapa uno\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,A,X,X,X,B,B,B,X,X,X,A,X\nX,A,A,X,X,B,B,B,X,X,A,A,X\nX,A,A,A,A,B,B,B,A,A,A,A,X\nX,A,A,A,A,A,A,A,A,A,A,A,X\nX,A,X,X,X,B,B,B,X,X,X,A,X\nX,X,A,A,X,A,A,A,X,A,A,X,X\nD,X,X,A,X,A,A,A,X,A,X,X,D\nA,A,X,X,X,A,A,A,X,X,X,A,A\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,X,A,A,X,A,A,A,X,A,A,X,X\nX,X,A,A,X,A,A,A,X,A,A,X,X\nX,X,X,X,X,A,A,A,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X";
+
+  LEVEL2 = "mapa dos\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,A,X,X,X,X,X,X,X,A,X,X\nA,A,A,A,A,X,X,X,A,A,A,A,A\nX,A,A,A,X,X,X,X,X,A,A,A,X\nX,X,A,X,X,X,X,X,X,X,A,X,X\nX,X,X,X,X,X,A,X,X,X,X,X,X\nX,X,X,X,A,A,B,A,A,X,X,X,X\nX,X,X,X,A,B,C,B,A,X,X,X,X\nX,X,X,A,B,C,C,C,B,A,X,X,X\nX,X,X,A,A,B,C,B,A,A,X,X,X\nX,X,X,X,A,A,B,A,A,X,X,X,X\nX,X,X,X,X,X,A,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X";
+
+  LEVEL3 = "mapa tres\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,B,B,B,X,X,X,X,X\nX,X,X,B,B,B,B,B,B,B,X,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,X,A,A,A,A,A,A,A,A,A,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X\nX,X,X,X,X,X,X,X,X,X,X,X,X";
+
+  LEVELS = [LEVEL0, LEVEL1, LEVEL2, LEVEL3];
 
   collision = function(sprite1, sprite2) {
     var angle, collide;
@@ -582,16 +590,14 @@
 
   LevelMap = (function() {
 
-    function LevelMap(content) {
-      var brick, bricks, col, line, lines, row, type, x, y, _ref, _ref2;
-      this.lifes = 3;
-      this.points = 0;
-      this.bricks = [];
+    function LevelMap() {
       this.paddle = new Paddle(this);
       this.board = new Board(this);
       this.ball = new Ball(this);
-      this.bonus = null;
       this.music = resource.sound("sounds/ride-the-storm.ogg");
+      this.bricks = [];
+      this.bonus = null;
+      this.currentLevel = 0;
       this.stateLabel = new Label({
         font: "20pt Arial",
         color: "yellow",
@@ -600,6 +606,13 @@
         alignment: "center",
         text: "Presione 'espacio' para lanzar"
       });
+    }
+
+    LevelMap.prototype.init = function(content) {
+      var brick, bricks, col, line, lines, row, type, x, y, _ref, _ref2;
+      this.bricks = [];
+      this.lifes = 3;
+      this.points = 0;
       lines = content.split("\n");
       this.name = lines[0];
       lines = lines.slice(1);
@@ -616,12 +629,8 @@
           }
         }
       }
-    }
-
-    LevelMap.prototype.init = function() {
       this.paddle.init();
-      this.ball.init();
-      return this.music.play();
+      return this.ball.init();
     };
 
     LevelMap.prototype.removeBrickAt = function(x, y) {
@@ -920,6 +929,7 @@
     }
 
     Ball.prototype.init = function() {
+      this.state = 'ready';
       this.speedX = this.MAX_SPEED / 2;
       this.speedY = -this.MAX_SPEED / 2;
       this.limitRight = CONFIG.mapWidth - this.width();
@@ -1005,7 +1015,6 @@
       if (collision(this, paddle) === SIDE.top) {
         if (paddle.sticky) {
           this.init();
-          this.state = "ready";
         } else {
           this.bouncePaddle(paddle);
         }
@@ -1013,7 +1022,6 @@
       if (this.y > this.limitBottom) {
         this.init();
         this.map.die();
-        this.state = "ready";
       }
       _ref = this.map.checkCollision(this), brick = _ref[0], side = _ref[1];
       if (side && !this.fireball) return this.bounceBrick(brick, side);
@@ -1445,7 +1453,7 @@
   Label = tinto.text.Label;
 
   window.onload = function() {
-    var canvas, levelMap, loading;
+    var canvas, levelMap, loading, ready;
     canvas = new tinto.canvas.GameCanvas('gamecanvas', {
       width: CONFIG.mapWidth,
       height: CONFIG.mapHeight + CONFIG.boardHeight,
@@ -1457,13 +1465,22 @@
       x: CONFIG.mapWidth / 2,
       y: CONFIG.mapHeight / 2,
       alignment: "center",
-      text: "Loading..."
+      text: "Cargando..."
     });
     loading.draw();
-    levelMap = new LevelMap(LEVEL1);
+    levelMap = new LevelMap();
+    ready = false;
     tinto.resource.loaded(function() {
-      return levelMap.init();
+      ready = true;
+      return levelMap.init(LEVELS[0]);
     });
+    window.loadMap = function(level) {
+      if (ready) {
+        return levelMap.init(LEVELS[level]);
+      } else {
+        return alert("Estoy cargando, por favor espere un momento.");
+      }
+    };
     tinto.resource.loadAll();
     canvas.update(function(dt) {
       return levelMap.update(dt);

@@ -14,6 +14,7 @@ class Ball extends Sprite
     @fireball = false
 
   init: ->
+    @state = 'ready'
     @speedX = @MAX_SPEED / 2
     @speedY = -@MAX_SPEED / 2
     @limitRight = CONFIG.mapWidth - @width()
@@ -86,14 +87,12 @@ class Ball extends Sprite
     if collision(this, paddle) == SIDE.top
       if paddle.sticky
         @init()
-        @state = "ready"
       else
         @bouncePaddle(paddle)
 
     if @y > @limitBottom
       @init()
       @map.die()
-      @state = "ready"
 
     [brick, side] = @map.checkCollision(this)
     if side and not @fireball

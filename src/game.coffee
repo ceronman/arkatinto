@@ -16,14 +16,22 @@ window.onload = ->
     x: CONFIG.mapWidth / 2
     y: CONFIG.mapHeight / 2
     alignment: "center"
-    text: "Loading..."
+    text: "Cargando..."
 
   loading.draw()
 
-  levelMap = new LevelMap(LEVEL1)
+  levelMap = new LevelMap()
 
+  ready = false
   tinto.resource.loaded () ->
-    levelMap.init()
+    ready = true
+    levelMap.init(LEVELS[0])
+
+  window.loadMap = (level) ->
+    if ready
+      levelMap.init(LEVELS[level])
+    else
+      alert "Estoy cargando, por favor espere un momento."
 
   tinto.resource.loadAll()
 

@@ -45,16 +45,14 @@ class Brick extends Sprite
 
 
 class LevelMap
-  constructor: (content) ->
-    @lifes = 3
-    @points = 0
-    @bricks = []
-
+  constructor: ->
     @paddle = new Paddle(this)
     @board = new Board(this)
     @ball = new Ball(this)
-    @bonus = null
     @music = resource.sound("sounds/ride-the-storm.ogg")
+    @bricks = []
+    @bonus = null
+    @currentLevel = 0
 
     @stateLabel  = new Label
       font: "20pt Arial"
@@ -63,6 +61,11 @@ class LevelMap
       y: 3* CONFIG.mapHeight / 4
       alignment: "center"
       text: "Presione 'espacio' para lanzar"
+
+  init: (content) ->
+    @bricks = []
+    @lifes = 3
+    @points = 0
 
     lines = content.split("\n")
     @name = lines[0]
@@ -79,10 +82,8 @@ class LevelMap
           brick = new Brick(x, y, type)
           @bricks.push brick
 
-  init: ->
     @paddle.init()
     @ball.init()
-    @music.play()
 
   removeBrickAt: (x, y) ->
     # This is really inefficient.
