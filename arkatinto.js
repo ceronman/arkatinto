@@ -592,7 +592,6 @@
       this.ball = new Ball(this);
       this.bonus = null;
       this.music = resource.sound("sounds/ride-the-storm.ogg");
-      this.music.play();
       this.stateLabel = new Label({
         font: "20pt Arial",
         color: "yellow",
@@ -621,7 +620,8 @@
 
     LevelMap.prototype.init = function() {
       this.paddle.init();
-      return this.ball.init();
+      this.ball.init();
+      return this.music.play();
     };
 
     LevelMap.prototype.removeBrickAt = function(x, y) {

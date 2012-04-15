@@ -55,7 +55,6 @@ class LevelMap
     @ball = new Ball(this)
     @bonus = null
     @music = resource.sound("sounds/ride-the-storm.ogg")
-    @music.play()
 
     @stateLabel  = new Label
       font: "20pt Arial"
@@ -83,6 +82,7 @@ class LevelMap
   init: ->
     @paddle.init()
     @ball.init()
+    @music.play()
 
   removeBrickAt: (x, y) ->
     # This is really inefficient.
