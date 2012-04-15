@@ -172,6 +172,7 @@ class LevelMap
         @currentLevel++
         if @currentLevel <= CONFIG.maxLevel
           @init(LEVELS[@currentLevel])
+          @ball.state = 'ready'
       return
 
     if (@ball.state == "playing" and key("space") and

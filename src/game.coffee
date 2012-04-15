@@ -30,6 +30,7 @@ window.onload = ->
   window.loadMap = (level) ->
     if ready
       levelMap.init(LEVELS[level])
+      tinto.input.clear()
     else
       alert "Estoy cargando, por favor espere un momento."
 

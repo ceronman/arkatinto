@@ -157,6 +157,9 @@
     else
       return false
 
+  clear: ->
+    keysDown = {}
+
   keypressed: (callback) -> keyPressedEvent.addCallback(callback)
   keyreleased: (callback) -> keyReleasedEvent.addCallback(callback)
 

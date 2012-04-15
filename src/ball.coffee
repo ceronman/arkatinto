@@ -48,6 +48,7 @@ class Ball extends Sprite
       when "playing" then @updatePlaying dt
       when "ready" then @updateReady dt
       when "lost" then @updateLost dt
+      when "win" then @updateLost dt
 
   updateLost: (dt) ->
     paddle = @map.paddle
@@ -60,11 +61,11 @@ class Ball extends Sprite
     @y = paddle.top() - @height()
 
     if key("space")
+      @state = "playing"
       if paddle.sticky
         # FIXME
         @map.activeAction.stop()
         @map.activeAction = null
-      @state = "playing"
 
   updatePlaying: (dt) ->
     paddle = @map.paddle

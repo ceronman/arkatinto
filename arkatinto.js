@@ -268,6 +268,9 @@
           return false;
         }
       },
+      clear: function() {
+        return keysDown = {};
+      },
       keypressed: function(callback) {
         return keyPressedEvent.addCallback(callback);
       },
@@ -729,6 +732,7 @@
           this.currentLevel++;
           if (this.currentLevel <= CONFIG.maxLevel) {
             this.init(LEVELS[this.currentLevel]);
+            this.ball.state = 'ready';
           }
         }
         return;
@@ -989,6 +993,8 @@
           return this.updateReady(dt);
         case "lost":
           return this.updateLost(dt);
+        case "win":
+          return this.updateLost(dt);
       }
     };
 
@@ -1005,11 +1011,11 @@
       this.x = paddle.centerX() - this.width() / 2;
       this.y = paddle.top() - this.height();
       if (key("space")) {
+        this.state = "playing";
         if (paddle.sticky) {
           this.map.activeAction.stop();
-          this.map.activeAction = null;
+          return this.map.activeAction = null;
         }
-        return this.state = "playing";
       }
     };
 
@@ -1494,7 +1500,8 @@
     });
     window.loadMap = function(level) {
       if (ready) {
-        return levelMap.init(LEVELS[level]);
+        levelMap.init(LEVELS[level]);
+        return tinto.input.clear();
       } else {
         return alert("Estoy cargando, por favor espere un momento.");
       }
